@@ -1,5 +1,6 @@
 const express = require("express");
 const socketIO = require("socket.io");
+const cors = require("cors");
 
 // server loader
 // starts up express on the configured port, then attaches socket.io
@@ -9,13 +10,15 @@ module.exports = (config) => {
   }
 
   const app = express();
+  // display server port
+  // enable CORS
+  app.get("/port", cors(), function (req, res) {
+    res.end(config.PORT.toString());
+  });
+
   // start express
   const server = app.listen(config.PORT, () => {
     console.log(`listening to ${config.PORT}`);
-  });
-  // display server port
-  app.get("/port", function (req, res) {
-    res.end(config.PORT.toString());
   });
 
   // start websocket server
