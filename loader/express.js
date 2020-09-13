@@ -9,15 +9,8 @@ module.exports = (config) => {
     throw new Error("invalid config: no port number specified");
   }
 
-  const app = express();
-  // display server port
-  // enable CORS
-  app.get("/port", cors(), function (req, res) {
-    res.end(config.PORT.toString());
-  });
-
   // start express
-  const server = app.listen(config.PORT, () => {
+  const server = express().listen(config.PORT, () => {
     console.log(`listening to ${config.PORT}`);
   });
 
