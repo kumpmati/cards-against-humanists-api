@@ -13,8 +13,9 @@ module.exports = (config) => {
   const server = app.listen(config.PORT, () => {
     console.log(`listening to ${config.PORT}`);
   });
-  app.get("/", function (req, res) {
-    res.end(JSON.stringify(config.PORT));
+  // display server port
+  app.get("/port", function (req, res) {
+    res.end(config.PORT.toString());
   });
 
   // start websocket server
