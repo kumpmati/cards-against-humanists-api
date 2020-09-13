@@ -8,9 +8,13 @@ module.exports = (config) => {
     throw new Error("invalid config: no port number specified");
   }
 
+  const app = express();
   // start express
-  const server = express().listen(config.PORT, () => {
+  const server = app.listen(config.PORT, () => {
     console.log(`listening to ${config.PORT}`);
+  });
+  app.get("/", function (req, res) {
+    res.end(JSON.stringify(config.PORT));
   });
 
   // start websocket server
