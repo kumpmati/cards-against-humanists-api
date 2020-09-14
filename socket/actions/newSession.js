@@ -1,7 +1,7 @@
 const { v5: uuidv5 } = require("uuid");
 
 // NEW_SESSION actions and response
-module.exports = ({ data, gameHandler }) => {
+module.exports = ({ data, gameHandler, socket }) => {
   if (!data.name) {
     return { error: "MISSING_PARAMS", data: ["name"] };
   }
@@ -13,6 +13,9 @@ module.exports = ({ data, gameHandler }) => {
     session_id,
     data: { name: data.name },
   });
+
+  // attach session id to socket
+  socket.session_id = session_id;
 
   // return the session data
   return { session_id, ...gameHandler.getPlayer(session_id) };

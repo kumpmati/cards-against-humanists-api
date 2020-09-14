@@ -1,9 +1,8 @@
 const express = require("express");
 const socketIO = require("socket.io");
-const cors = require("cors");
 
 // server loader
-// starts up express on the configured port, then attaches socket.io
+// starts up express and socket.io
 module.exports = (config) => {
   if (!config || !config.PORT) {
     throw new Error("invalid config: no port number specified");
@@ -11,12 +10,11 @@ module.exports = (config) => {
 
   // start express
   const server = express().listen(config.PORT, () => {
-    console.log(`listening to ${config.PORT}`);
+    console.log(`express started on port ${config.PORT}`);
   });
 
-  // start websocket server
+  // start socket.io server, mounting it to express
   const socketServer = socketIO(server);
 
-  console.log("server loaded");
   return { server, socketServer };
 };

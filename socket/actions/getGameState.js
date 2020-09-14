@@ -16,9 +16,10 @@ module.exports = ({ data, gameHandler, socket }) => {
     };
   }
 
+  const playerList = gameHandler.getGame(data.room_name).players;
   const gameState = gameHandler.getGameState(data.room_name);
   if (!gameState) {
     return { error: "INVALID_ACTION", data: "Game not found" };
   }
-  return { data: gameState };
+  return { data: gameState, players: Array.from(playerList) };
 };

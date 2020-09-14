@@ -6,13 +6,30 @@ class Database {
   getRef(s) {
     return this.db.ref(s);
   }
-  // returns a value without realtime updating
-  once(s, callback) {
-    this.getRef(s).once("value", (val) => callback(val.val()));
+
+  get(path, callback) {
+    this.getRef(path).once("value", (val) => callback(val.val()));
   }
 
-  snapshot(s, callback) {
-    this.getRef(s).on("value", (snap) => callback(snap.val()));
+  set(path, value) {
+    this.getRef(path).set(value);
+  }
+
+  listen(path, callback) {
+    this.getRef(path).on("value", (val) => callback(val.val()));
+  }
+
+  listenForChanges(path, callback) {
+    const ref = this.getRef(path);
+    ref.on("child_added", (val) =>
+      callback({ data: val.val(), type: "child_added" })
+    );
+    ref.on("child_removed", (val) =>
+      callback({ data: val.val(), type: "child_removed" })
+    );
+    ref.on("child_changed", (val) =>
+      callback({ data: val.val(), type: "child_changed" })
+    );
   }
 }
 

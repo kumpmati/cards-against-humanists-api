@@ -13,7 +13,7 @@ module.exports = ({ data, gameHandler, socket }) => {
     };
   }
 
-  // attach session id to socket for validation when sending data
+  // attach session id to socket
   socket.session_id = data.session_id;
 
   return { session_id: data.session_id, ...playerData };

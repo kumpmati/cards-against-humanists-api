@@ -1,3 +1,11 @@
+# nodejs module folder
 node_modules/
 
+# environment variables
 .env
+
+# local files
+*.local
+
+# development files
+dev/

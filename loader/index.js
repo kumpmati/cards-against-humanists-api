@@ -1,22 +1,23 @@
 const loadConfig = require("./config");
 const loadServer = require("./express");
 const loadFirebase = require("./firebase");
-const loadGameHandler = require("./game");
+const loadDBHandler = require("./db");
 const loadHandlers = require("./handlers");
 
+// main loader
 module.exports = () => {
   // config
   const config = loadConfig();
 
   // firebase core and realtime database
-  const { app, db } = loadFirebase(config);
+  const { app, rtDB } = loadFirebase(config);
+
+  // load db handler
+  const rtDBHandler = loadDBHandler({ config, rtDB });
 
   // express and socket.io
-  const { server, socketServer } = loadServer(config);
+  const { socketServer } = loadServer(config);
 
-  // load game handler
-  const gameHandler = loadGameHandler({ config, db });
-
-  // handlers
-  const handlers = loadHandlers({ socketServer, gameHandler });
+  // attach socket server and game handler
+  loadHandlers({ socketServer, rtDB: rtDBHandler });
 };

@@ -1,17 +1,22 @@
+const info = {
+  name: "Cards Against Humanists",
+  short_name: "CAHu",
+};
+
 // cards against humanists rule evaluator
 const initialState = {
   used_cards: [],
-  players: [],
 };
 
 const evaluate = (currentState, data) => {
   const newState = data;
-  console.log("evaluated cards against humanists data:", data);
+  console.log("cards against humanists evaluator:", data);
   return newState;
 };
 
-const sanitize = (data, session_id) => {
-  return { ...data, targetId: session_id };
+const sanitize = (data, sid) => {
+  console.log("cards against humanists sanitizer");
+  return { ...data, targetId: sid };
 };
 
-module.exports = { initialState, evaluate, sanitize };
+module.exports = { initialState, evaluate, sanitize, info };

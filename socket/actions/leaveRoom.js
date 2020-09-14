@@ -1,4 +1,4 @@
-// JOIN_ROOM actions and response
+// LEAVE_ROOM actions and response
 module.exports = ({ data, gameHandler, socket }) => {
   // error if name or session id is missing
   if (!data.room_name || !data.session_id) {
@@ -15,10 +15,9 @@ module.exports = ({ data, gameHandler, socket }) => {
 
   const playerData = gameHandler.getPlayer(data.session_id);
   if (!!playerData) {
-    gameHandler.addPlayer({
+    gameHandler.removePlayer({
       room_name: data.room_name,
       session_id: data.session_id,
-      data: playerData,
     });
   }
 
