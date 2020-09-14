@@ -5,12 +5,12 @@ const loadDBHandler = require("./db");
 const loadHandlers = require("./handlers");
 
 // main loader
-module.exports = () => {
+module.exports = async () => {
   // config
   const config = loadConfig();
 
   // firebase core and realtime database
-  const { app, rtDB } = loadFirebase(config);
+  const { app, rtDB } = await loadFirebase(config);
 
   // load db handler
   const rtDBHandler = loadDBHandler({ config, rtDB });

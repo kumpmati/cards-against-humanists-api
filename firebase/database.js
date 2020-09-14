@@ -1,6 +1,6 @@
 class Database {
-  constructor(app) {
-    this.db = app.database();
+  constructor(db) {
+    this.db = db;
   }
 
   getRef(s) {
