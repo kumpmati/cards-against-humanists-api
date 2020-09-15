@@ -10,10 +10,10 @@ module.exports = async () => {
   const config = loadConfig();
 
   // firebase core and realtime database
-  const { app, rtDB } = await loadFirebase(config);
+  const { app, db } = await loadFirebase(config);
 
   // load db handler
-  const rtDBHandler = loadDBHandler({ config, rtDB });
+  const rtDBHandler = loadDBHandler({ config, db });
 
   // express and socket.io
   const { socketServer } = loadServer(config);

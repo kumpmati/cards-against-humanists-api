@@ -7,7 +7,7 @@ const validParams = (data) =>
   !!data.game_type;
 
 // CREATE_ROOM
-async function createRoom({ data, rtDB, socket }) {
+async function createRoom({ data, rtDB }) {
   if (!validParams(data)) {
     return {
       error: "MISSING_PARAMS",
@@ -17,8 +17,8 @@ async function createRoom({ data, rtDB, socket }) {
 
   if (!(await rtDB.playerExists(data.sid))) {
     return {
-      error: "INVALID_ACTION",
-      data: "player not authenticated",
+      error: "INVALID_REQUEST",
+      data: "player not found",
     };
   }
   // todo: make joining update player to db

@@ -2,7 +2,7 @@
 const validParams = (data) => !!data && !!data.sid;
 
 // GET_STATE
-async function getState({ data, rtDB, socket }) {
+async function getState({ data, rtDB }) {
   if (!validParams(data)) {
     return {
       error: "MISSING_PARAMS",
@@ -13,7 +13,7 @@ async function getState({ data, rtDB, socket }) {
   const player = await rtDB.getPlayer(data.sid);
   if (!player) {
     return {
-      error: "INVALID_ACTION",
+      error: "INVALID_REQUEST",
       data: "player not found",
     };
   }
@@ -21,7 +21,7 @@ async function getState({ data, rtDB, socket }) {
   const room = await rtDB.getRoom(player.current_room);
   if (!room) {
     return {
-      error: "INVALID_ACTION",
+      error: "INVALID_REQUEST",
       data: "room not found",
     };
   }

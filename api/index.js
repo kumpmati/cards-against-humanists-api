@@ -24,6 +24,9 @@ function executeAction({ data, socket, rtDB }) {
     case types.GetState:
       return actions.getStateAction(params);
 
+    case types.SendAction:
+      return actions.sendActionAction(params);
+
     default:
       return {
         error: "INVALID_TYPE",

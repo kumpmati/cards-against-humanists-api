@@ -12,17 +12,21 @@ async function sendAction({ data, rtDB, socket }) {
 
   const player = await rtDB.getPlayer(data.sid);
   if (!player) {
-    return { error: "NOT_FOUND", data: "player not foun" };
+    return { error: "INVALID_REQUEST", data: "player not found" };
   }
 
   // get current room player is in
   const room = await rtDB.getRoom(player.current_room);
   if (!room) {
-    return { error: "NOT_FOUND", data: "room not found" };
+    return { error: "INVALID_REQUEST", data: "room not found" };
   }
 
   // todo: evaluate using room's game
   console.log("sendAction todo: evaluate using room's game");
+  return {
+    error: "NOT_IMPLEMENTED",
+    data: "this feature is not yet implemented",
+  };
 }
 
 module.exports = sendAction;

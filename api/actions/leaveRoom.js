@@ -2,7 +2,7 @@
 const validParams = (data) => !!data && !!data.sid;
 
 // LEAVE_ROOM
-async function leaveRoom({ data, rtDB, socket }) {
+async function leaveRoom({ data, rtDB }) {
   if (!validParams(data)) {
     return {
       error: "MISSING_PARAMS",

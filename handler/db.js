@@ -2,7 +2,7 @@ const INACTIVE_SWEEP_INTERVAL = 30;
 const TIME_INACTIVE_UNTIL_REMOVE = 60;
 
 class DBHandler {
-  constructor({ rtDB }) {
+  constructor({ config, db }) {
     this.playerList = new Map();
     this.roomList = new Map();
 

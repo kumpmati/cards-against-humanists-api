@@ -8,6 +8,10 @@ module.exports = () => {
   const config = {
     PORT: process.env.PORT || 9000,
     firebaseConfig,
+    dbHandlerConfig: {
+      players: "/players",
+      rooms: "/rooms",
+    },
   };
 
   return config;

@@ -3,7 +3,7 @@ const validParams = (data) =>
   !!data && !!data.sid && !!data.room_name && !!data.room_password;
 
 // JOIN_ROOM
-async function joinRoom({ data, rtDB, socket }) {
+async function joinRoom({ data, rtDB }) {
   if (!validParams(data)) {
     return {
       error: "MISSING_PARAMS",
