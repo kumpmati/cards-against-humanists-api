@@ -1,4 +1,4 @@
-const DBHandler = require("../handler/db");
+const GameHandler = require("../handler/game");
 
 // db handler loader
 module.exports = ({ config, db }) => {
@@ -7,5 +7,5 @@ module.exports = ({ config, db }) => {
     return;
   }
   const cfg = config.dbHandlerConfig;
-  return new DBHandler({ config: cfg, db });
+  return new GameHandler({ config: cfg, db });
 };

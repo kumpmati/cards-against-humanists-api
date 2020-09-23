@@ -1,7 +1,7 @@
 const validParams = (data) => !!data && !!data.sid;
 
 // VALIDATE_SESSION
-async function validateSession({ data, rtDB, socket }) {
+function validateSession({ data, rtDB, socket }) {
   if (!validParams(data)) {
     return {
       error: "MISSING_PARAMS",
@@ -9,7 +9,7 @@ async function validateSession({ data, rtDB, socket }) {
     };
   }
 
-  const player = await rtDB.getPlayer(data.sid);
+  const player = rtDB.getPlayer(data.sid);
   if (!player) {
     return {
       error: "NOT_FOUND",

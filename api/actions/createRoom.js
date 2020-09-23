@@ -7,7 +7,7 @@ const validParams = (data) =>
   !!data.game_type;
 
 // CREATE_ROOM
-async function createRoom({ data, rtDB }) {
+function createRoom({ data, rtDB }) {
   if (!validParams(data)) {
     return {
       error: "MISSING_PARAMS",
@@ -15,15 +15,14 @@ async function createRoom({ data, rtDB }) {
     };
   }
 
-  if (!(await rtDB.playerExists(data.sid))) {
+  if (!rtDB.getPlayer(data.sid)) {
     return {
       error: "INVALID_REQUEST",
       data: "player not found",
     };
   }
-  // todo: make joining update player to db
-  console.log("createRoom todo: make joining update player to db");
-  const result = await rtDB.createRoom({
+
+  const result = rtDB.createRoom({
     room_name: data.room_name,
     room_password: data.room_password,
     game_type: data.game_type,

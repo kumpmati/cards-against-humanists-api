@@ -2,7 +2,7 @@
 const validParams = (data) => !!data && !!data.sid && !!data.data;
 
 // SEND_ACTION
-async function sendAction({ data, rtDB, socket }) {
+function sendAction({ data, rtDB }) {
   if (!validParams(data)) {
     return {
       error: "MISSING_PARAMS",
@@ -10,23 +10,20 @@ async function sendAction({ data, rtDB, socket }) {
     };
   }
 
-  const player = await rtDB.getPlayer(data.sid);
+  const player = rtDB.getPlayer(data.sid);
   if (!player) {
     return { error: "INVALID_REQUEST", data: "player not found" };
   }
 
   // get current room player is in
-  const room = await rtDB.getRoom(player.current_room);
+  const room = rtDB.getRoom(player.current_room);
   if (!room) {
     return { error: "INVALID_REQUEST", data: "room not found" };
   }
 
-  // todo: evaluate using room's game
-  console.log("sendAction todo: evaluate using room's game");
-  return {
-    error: "NOT_IMPLEMENTED",
-    data: "this feature is not yet implemented",
-  };
+  // evaluate the 'data' field of the client request
+  const evaluationResult = rtDB.evaluateActionData({ room, data });
+  return evaluationResult ? evaluationResult : { success: 1 };
 }
 
 module.exports = sendAction;
