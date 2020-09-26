@@ -11,13 +11,8 @@ module.exports = (config) => {
 
   const app = express();
 
-  // configure cors to accept requests from frontend
-  var corsOptions = {
-    origin: "https://cards-against-humanist.xyz",
-    optionsSuccessStatus: 200,
-  };
   // enable cors
-  app.options("*", cors(corsOptions));
+  app.use(cors());
 
   // start express
   const server = app.listen(config.PORT, () => {
