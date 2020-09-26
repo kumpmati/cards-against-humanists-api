@@ -17,7 +17,7 @@ module.exports = (config) => {
     optionsSuccessStatus: 200,
   };
   // enable cors
-  app.use(cors(corsOptions));
+  app.options("*", cors(corsOptions));
 
   // start express
   const server = app.listen(config.PORT, () => {
