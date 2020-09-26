@@ -160,14 +160,14 @@ class GameHandler {
 
   // evaluate a new state
   evaluateActionData({ room, data }) {
-    const validState = game.evaluator(room.state, data);
+    const validState = game.evaluator(room, data);
     // if evaluation returns null, data was invalid and room should not be updated
     if (!validState) {
-      return { error: "INVALID_MOVE", data: "invalid game move" };
+      return { error: "INVALID_MOVE", data: "move not allowed" };
     }
 
     // update room state
-    room.state = validState;
+    room = validState;
     // send an update event
     this.updateRoom({ room_id: room.room_id, room });
     return null;

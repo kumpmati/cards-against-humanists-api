@@ -1,13 +1,10 @@
-/*
- * Czar
+/**
+ * Utility functions for handling the game data
  */
-const setCurrentCzar = (room, sid) => (room.state.current_czar = sid);
-const getCurrentCzar = (room) => room.state.current_czar;
 
 /*
  * Game status
  */
-
 const setGameStatus = (room, status) => (room.state.game_status = status);
 const getGameStatus = (room) => room.state.game_status;
 const status = {
@@ -28,16 +25,21 @@ const getCurrentQuestion = (room) => room.state.current_question;
 /*
  * Player
  */
-// players
 const getPlayers = (room) => Array.from(room.players);
-// cards
+
 const getPlayerCards = (room, sid) => room.state.player_cards.get(sid);
 const setPlayerCards = (room, sid, value) =>
   room.state.player_cards.set(sid, value);
-// score
+
 const getPlayerScore = (room, sid) => room.state.player_scores.get(sid);
 const setPlayerScore = (room, sid, value) =>
   room.state.player_scores.set(sid, value);
+
+/*
+ * Czar
+ */
+const setCurrentCzar = (room, sid) => (room.state.current_czar = sid);
+const getCurrentCzar = (room) => room.state.current_czar;
 
 /*
  * Room activity
