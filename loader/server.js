@@ -14,6 +14,10 @@ module.exports = (config) => {
   // enable cors
   app.use(cors());
 
+  app.get("/", function (req, res) {
+    res.end(":^)");
+  });
+
   // start express
   const server = app.listen(config.PORT, () => {
     console.log(`express started on port ${config.PORT}`);
