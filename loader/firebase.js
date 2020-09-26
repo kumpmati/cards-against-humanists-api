@@ -1,9 +1,20 @@
 const firebase = require("../firebase/firebase");
-const Database = require("../firebase/database");
 
-module.exports = ({ firebaseConfig }) => {
-  // initialize app and realtime database connection
+module.exports = async ({ firebaseConfig }) => {
+  // initialize firebase
   const app = firebase.initializeApp(firebaseConfig);
-  const db = new Database(app);
+  // get a reference to the database
+  const db = app.database();
+
+  // sign in to firebase to get db read/write access
+  if (!!firebaseConfig.dbEmail && !!firebaseConfig.dbPassword) {
+    await app
+      .auth()
+      .signInWithEmailAndPassword(
+        firebaseConfig.dbEmail,
+        firebaseConfig.dbPassword
+      );
+  }
+
   return { app, db };
 };

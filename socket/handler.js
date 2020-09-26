@@ -26,6 +26,21 @@ function socketHandler({ socket, gameHandler }) {
       data: response,
     });
   });
+
+  socket.on("disconnect", () => {
+    if (socket.session_id) {
+      const playerData = gameHandler.getPlayer(socket.session_id);
+      if (!!playerData) {
+        // remove player from room
+        gameHandler.removePlayer({
+          session_id: socket.session_id,
+          room_name: playerData.room_name,
+        });
+      }
+    } else {
+      console.log("disconnected without session id");
+    }
+  });
 }
 
 module.exports = socketHandler;

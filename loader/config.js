@@ -1,13 +1,15 @@
 // load environment variables
 require("dotenv").config();
 
-const firebaseConfig = require("../firebase/config");
+const firebaseConfig = require("../config/firebase");
+const dbHandlerConfig = require("../config/dbHandler");
 
 module.exports = () => {
   // global config
   const config = {
     PORT: process.env.PORT || 9000,
     firebaseConfig,
+    dbHandlerConfig,
   };
 
   return config;

@@ -1,20 +1,28 @@
-const socketHandler = require("../socket/handler");
-const { Heartbeat } = require("../types/message");
+const socketHandler = require("../handler/socket");
+
+/*
+ * Game
+ */
+const { formatter } = require("../game/CardsAgainstHumanists");
 
 // socket handler loader
-module.exports = ({ socketServer, gameHandler }) => {
-  // inject game handler to socket handler
-  socketServer.on("connection", (socket) => {
-    // delegate socket to handler along with game handler
-    socketHandler({ socket, gameHandler });
+function loadHandlers({ socketServer, game }) {
+  // when a room is updated, send the new state to every session in that room
+  game.on("room-update", (d) => {
+    // get session ids of players in room
+    const sessions = Array.from(d.players.keys());
 
-    // set up heartbeat signal
-    setInterval(() => {
-      socket.emit("data", { type: Heartbeat, data: new Date() });
-    }, 2000);
-
-    socket.on("disconnect", () => {
-      clearInterval();
+    // send formatted data for each player
+    sessions.forEach((session) => {
+      // format data before sending to client
+      socketServer.to(session).emit("room-update", formatter(d, session));
     });
   });
-};
+
+  socketServer.on("connection", (socket) => {
+    // inject db handler
+    socketHandler({ socket, game });
+  });
+}
+
+module.exports = loadHandlers;
