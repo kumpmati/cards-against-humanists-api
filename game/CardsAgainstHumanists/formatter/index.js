@@ -1,43 +1,26 @@
-const { getName } = require("./util");
-const {
-  getGameStatus,
-  getCurrentQuestion,
-  getPlayerCards,
-  getCurrentCzar,
-  getPlayerScore,
-  getPlayers,
-} = require("../state/util");
+const { getGameStatus } = require("../state/util");
 
 /*
- * Formatter removes and formats the room state for a single player so that
- * they can't see sensitive data about other players, such as their cards
+ * Formatter functions
+ */
+const formatterFuncs = require("./funcs");
+const defaultFormatterFunc = formatterFuncs["default"];
+
+/*
+ * Formatter is called whenever the room state is sent to the player.
+ * It should remove any data that should not be shown to the player,
+ * e.g. other players' cards or session ids
  */
 const formatter = (room, sid) => {
-  // array of players, where each playes is in format: [sid, player]
-  const players = getPlayers(room);
+  const currentGameStatus = getGameStatus(room);
 
-  const formattedState = {
-    game_status: getGameStatus(room),
+  // get the formatter function matching the current game status
+  // and fallback to the default formatter if not defined
+  const formatterFunc =
+    formatterFuncs[currentGameStatus] || defaultFormatterFunc;
 
-    // get the current czar's name
-    current_czar: getName(getCurrentCzar(room)),
-
-    // get the names of all players
-    players: players.map(([sid, player]) => {
-      return {
-        name: getName(player),
-        score: getPlayerScore(room, sid),
-      };
-    }),
-
-    // get the current question card
-    current_question: getCurrentQuestion(room),
-
-    // get the player's in-hand cards as an array, default to an empty array
-    cards: getPlayerCards(room, sid) || [],
-  };
-
-  return formattedState;
+  // call the formatter and return the result
+  return formatterFunc(room, sid);
 };
 
 module.exports = formatter;

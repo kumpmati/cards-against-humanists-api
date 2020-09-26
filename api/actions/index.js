@@ -1,4 +1,6 @@
-// actions
+/*
+ * Actions
+ */
 
 const newSessionAction = require("./newSession");
 const validateSessionAction = require("./validateSession");
@@ -22,7 +24,9 @@ const actions = {
   sendActionAction,
 };
 
-// message types
+/*
+ * Message types
+ */
 const types = {
   NewSession: "NEW_SESSION",
   ValidateSession: "VALIDATE_SESSION",

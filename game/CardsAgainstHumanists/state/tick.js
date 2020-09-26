@@ -10,7 +10,7 @@ const {
 // if the game needs to be updated, the function should return the new state
 // if the game doesn't need updating this tick, then return null
 const tick = (room) => {
-  const numOfPlayers = getPlayers(room).length;
+  const players = getPlayers(room);
   const currentStatus = getGameStatus(room);
 
   // todo: end game if room has been inactive for a while
@@ -19,7 +19,7 @@ const tick = (room) => {
      * Wait for players
      */
     case status.waitingForPlayers:
-      if (numOfPlayers >= 4) {
+      if (players.length >= 2) {
         // automatically start game when at least 4 players have joined
         setGameStatus(room, status.startGame);
         return room;

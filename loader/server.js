@@ -8,8 +8,10 @@ module.exports = (config) => {
     throw new Error("invalid config: no port number specified");
   }
 
+  const app = express();
+
   // start express
-  const server = express().listen(config.PORT, () => {
+  const server = app.listen(config.PORT, () => {
     console.log(`express started on port ${config.PORT}`);
   });
 

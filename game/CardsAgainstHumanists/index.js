@@ -1,15 +1,15 @@
 /*
- * State management
+ * State
  */
 const state = require("./state");
 
 /*
- * Data evaluator function
+ * Data evaluator
  */
 const evaluator = require("./evaluator");
 
 /*
- * Data formatter function
+ * Data formatter
  */
 const formatter = require("./formatter");
 
