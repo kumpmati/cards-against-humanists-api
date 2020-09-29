@@ -1,6 +1,5 @@
 const loadConfig = require("./config");
 const loadServer = require("./server");
-const loadFirebase = require("./firebase");
 const loadGameHandler = require("./game");
 const loadHandlers = require("./handlers");
 
@@ -11,8 +10,8 @@ module.exports = async () => {
     const config = loadConfig();
 
     // firebase core and realtime database
-    const { app, db } = await loadFirebase(config);
-
+    ///const { app, db } = await loadFirebase(config);
+    const db = {};
     // load db handler
     const game = loadGameHandler({ config, db });
 

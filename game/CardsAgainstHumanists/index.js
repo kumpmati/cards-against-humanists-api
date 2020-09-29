@@ -4,6 +4,11 @@
 const state = require("./state");
 
 /*
+ * Tick
+ */
+const tick = require("./tick");
+
+/*
  * Data evaluator
  */
 const evaluator = require("./evaluator");
@@ -21,4 +26,4 @@ const info = {
   version: "0.0.1",
 };
 
-module.exports = { state, evaluator, formatter, info };
+module.exports = { state, tick, evaluator, formatter, info };

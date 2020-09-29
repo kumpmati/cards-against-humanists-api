@@ -12,17 +12,13 @@ function loadHandlers({ socketServer, game }) {
     // get session ids of players in room
     const sessions = Array.from(d.players.keys());
 
-    // send formatted data for each player
-    sessions.forEach((session) => {
-      // format data before sending to client
-      socketServer.to(session).emit("room-update", formatter(d, session));
-    });
+    // send formatted data for each player in the room
+    sessions.forEach((session) =>
+      socketServer.to(session).emit("room-update", formatter(d, session))
+    );
   });
 
-  socketServer.on("connection", (socket) => {
-    // inject db handler
-    socketHandler({ socket, game });
-  });
+  socketServer.on("connection", (socket) => socketHandler({ socket, game }));
 }
 
 module.exports = loadHandlers;

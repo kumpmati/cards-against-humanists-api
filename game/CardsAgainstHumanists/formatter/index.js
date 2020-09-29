@@ -4,7 +4,6 @@ const { getGameStatus } = require("../state/util");
  * Formatter functions
  */
 const formatterFuncs = require("./funcs");
-const defaultFormatterFunc = formatterFuncs["default"];
 
 /*
  * Formatter is called whenever the room state is sent to the player.
@@ -17,7 +16,7 @@ const formatter = (room, sid) => {
   // get the formatter function matching the current game status
   // and fallback to the default formatter if not defined
   const formatterFunc =
-    formatterFuncs[currentGameStatus] || defaultFormatterFunc;
+    formatterFuncs[currentGameStatus] || formatterFuncs.default;
 
   // call the formatter and return the result
   return formatterFunc(room, sid);

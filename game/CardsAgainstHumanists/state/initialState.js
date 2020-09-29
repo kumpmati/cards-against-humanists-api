@@ -26,6 +26,9 @@ const initialState = () => ({
 
   // timestamp of the last time a player was in the room
   last_time_active: new Date(),
+
+  // timer
+  timer: null,
 });
 
 module.exports = initialState;

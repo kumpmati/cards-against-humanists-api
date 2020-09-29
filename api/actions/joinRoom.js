@@ -1,25 +1,20 @@
+const { missingParamsErr } = require("../../util/errors");
+
 // must include sid, room_name and room_password
-const validParams = (data) =>
-  !!data && !!data.sid && !!data.room_id && !!data.room_password;
+const validParams = (data) => !!data && !!data.sid && !!data.room_id;
 
 // JOIN_ROOM
 function joinRoom({ data, rtDB }) {
   if (!validParams(data)) {
-    return {
-      error: "MISSING_PARAMS",
-      data: ["sid", "room_id", "room_password"],
-    };
+    return missingParamsErr("sid", "room_id");
   }
-
-  // leave other room first
-  rtDB.leaveRoom(data.sid);
 
   // add player to room
   // todo: check password
   const result = rtDB.joinRoom({
     sid: data.sid,
     room_id: data.room_id,
-    room_password: data.room_password,
+    room_password: data.room_password || null,
   });
 
   return result;

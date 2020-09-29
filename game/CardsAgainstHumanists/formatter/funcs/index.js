@@ -1,5 +1,3 @@
-const { status } = require("../../state/util");
-
 /*
  * Formatter functions
  */
