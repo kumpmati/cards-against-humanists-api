@@ -12,7 +12,7 @@ const {
  */
 module.exports = (room) => {
 	// set timer if not set already
-	if (!getTimer(room)) setTimer(room, 15);
+	if (!getTimer(room)) setTimer(room, 60);
 
 	/*
 	 * Skip if nobody submitted anything
