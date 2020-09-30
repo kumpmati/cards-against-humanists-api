@@ -2,15 +2,15 @@
 require("dotenv").config();
 
 const firebaseConfig = require("../config/firebase");
-const dbHandlerConfig = require("../config/dbHandler");
+const gameHandlerConfig = require("../config/gameHandler");
 
 module.exports = () => {
-  // global config
-  const config = {
-    PORT: process.env.PORT || 9000,
-    firebaseConfig,
-    dbHandlerConfig,
-  };
+	// global config
+	const config = {
+		PORT: process.env.PORT || 9000,
+		firebaseConfig,
+		gameHandlerConfig,
+	};
 
-  return config;
+	return config;
 };

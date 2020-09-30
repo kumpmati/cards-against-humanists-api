@@ -22,8 +22,8 @@ const formatter = require("./formatter");
  * Game info
  */
 const info = {
-  name: "Cards Against Humanists",
-  version: "0.0.1",
+	name: "Cards Against Humanists",
+	version: "0.0.1",
 };
 
 module.exports = { state, tick, evaluator, formatter, info };

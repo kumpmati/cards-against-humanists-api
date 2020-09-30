@@ -14,7 +14,7 @@ const {
 } = require("../../state/util");
 
 /*
- * Default formatter function
+ * Formatter function for the PLAYERS_SUBMIT_ANSWERS state
  */
 const defaultFormatterFunc = (room, sid) => {
 	// get array of players and their SIDs
@@ -22,6 +22,11 @@ const defaultFormatterFunc = (room, sid) => {
 
 	// get the current czar as a player object
 	const czar = getPlayer(room, getCurrentCzar(room));
+
+	// get all submitted cards and remove the text
+	const submittedCards = getAllSubmittedCards(room).map((sub) =>
+		sub.map((c) => ({ text: "", id: c.id }))
+	);
 
 	/*
 	 * Formatted data
@@ -41,7 +46,8 @@ const defaultFormatterFunc = (room, sid) => {
 
 		table: {
 			current_question: getCurrentQuestion(room),
-			submitted_cards: getAllSubmittedCards(room),
+			// strip cards of text
+			submitted_cards: submittedCards,
 			cards: getPlayerCards(room, sid) || [],
 		},
 	};

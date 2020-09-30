@@ -1,7 +1,10 @@
+const { status } = require("../../state/util");
+
 /*
  * Formatter functions
  */
 const defaultFormatterFunc = require("./default");
+const playersSubmitAnswersFunc = require("./playersSubmitAnswers");
 
 /*
  * Match each game state with an formatter function.
@@ -10,7 +13,8 @@ const defaultFormatterFunc = require("./default");
  * e.g. formatterFuncs[status.gameLoop] => gameLoopFormatter
  */
 const formatterFuncs = {
-  default: defaultFormatterFunc,
+	default: defaultFormatterFunc,
+	[status.playersSubmitAnwsers]: playersSubmitAnswersFunc,
 };
 
 module.exports = formatterFuncs;

@@ -1,5 +1,7 @@
 /**
  * Utility functions for handling the game data
+ *
+ *
  */
 
 /*
@@ -8,12 +10,13 @@
 const setGameStatus = (room, status) => (room.state.game_status = status);
 const getGameStatus = (room) => room.state.game_status;
 const status = {
-  waitingForPlayers: "WAITING_FOR_PLAYERS",
-  startGame: "START_GAME",
-  endGame: "END_GAME",
-  gameLoop: "GAME_LOOP",
-  playersSubmitAnwsers: "PLAYERS_SUBMIT_ANSWERS",
-  czarChoosesWinner: "CZAR_CHOOSES_WINNER",
+	waitingForPlayers: "WAITING_FOR_PLAYERS",
+	startGame: "START_GAME",
+	endGame: "END_GAME",
+	gameLoop: "GAME_LOOP",
+	playersSubmitAnwsers: "PLAYERS_SUBMIT_ANSWERS",
+	czarChoosesWinner: "CZAR_CHOOSES_WINNER",
+	showWinner: "SHOW_WINNER",
 };
 
 /*
@@ -22,7 +25,7 @@ const status = {
 const setCurrentQuestion = (room, card) => (room.state.current_question = card);
 const getCurrentQuestion = (room) => room.state.current_question;
 const getRequiredCards = (room) =>
-  getCurrentQuestion(room) ? getCurrentQuestion(room).required_cards : 0;
+	getCurrentQuestion(room) ? getCurrentQuestion(room).required_cards : 0;
 
 /*
  * Player
@@ -32,17 +35,29 @@ const getPlayer = (room, sid) => room.players.get(sid);
 
 const getPlayerCards = (room, sid) => room.state.player_cards.get(sid);
 const setPlayerCards = (room, sid, value) =>
-  room.state.player_cards.set(sid, value);
+	room.state.player_cards.set(sid, value);
 
-const getSubmittedCards = (room, sid) => room.state.submitted_cards.get(sid);
-const setSubmittedCards = (room, sid, value) =>
-  room.state.submitted_cards.set(sid, value);
-const getAllSubmittedCards = (room) =>
-  Array.from(room.state.submitted_cards.values());
-
+/*
+ * Score
+ */
 const getPlayerScore = (room, sid) => room.state.player_scores.get(sid);
 const setPlayerScore = (room, sid, value) =>
-  room.state.player_scores.set(sid, value);
+	room.state.player_scores.set(sid, value);
+
+/*
+ * Submitted cards
+ */
+const getSubmittedCards = (room, sid) => room.state.submitted_cards.get(sid);
+const clearSubmittedCards = (room) => room.state.submitted_cards.clear();
+
+const setSubmittedCards = (room, sid, value) =>
+	room.state.submitted_cards.set(sid, value);
+
+const getAllSubmittedCards = (room) =>
+	Array.from(room.state.submitted_cards.values());
+
+const getAllSubmissions = (room) =>
+	Array.from(room.state.submitted_cards.entries());
 
 /*
  * Czar
@@ -61,9 +76,9 @@ const setLastActiveTime = (room) => (room.state.last_time_active = new Date());
  */
 const getTimer = (room) => room.state.timer;
 const setTimer = (room, seconds) => {
-  const dt = new Date();
-  dt.setSeconds(dt.getSeconds() + seconds);
-  room.state.timer = dt;
+	const dt = new Date();
+	dt.setSeconds(dt.getSeconds() + seconds);
+	room.state.timer = dt;
 };
 const clearTimer = (room) => (room.state.timer = null);
 
@@ -71,32 +86,34 @@ const clearTimer = (room) => (room.state.timer = null);
  * Exports
  */
 module.exports = {
-  setCurrentCzar,
-  getCurrentCzar,
+	status,
+	setGameStatus,
+	getGameStatus,
 
-  setGameStatus,
-  getGameStatus,
-  status,
+	setCurrentCzar,
+	getCurrentCzar,
 
-  setCurrentQuestion,
-  getCurrentQuestion,
-  getRequiredCards,
+	setCurrentQuestion,
+	getCurrentQuestion,
+	getRequiredCards,
 
-  getSubmittedCards,
-  getAllSubmittedCards,
-  setSubmittedCards,
+	clearSubmittedCards,
+	getSubmittedCards,
+	getAllSubmittedCards,
+	getAllSubmissions,
+	setSubmittedCards,
 
-  getPlayer,
-  getPlayers,
-  setPlayerCards,
-  getPlayerCards,
-  setPlayerScore,
-  getPlayerScore,
+	getPlayer,
+	getPlayers,
+	setPlayerCards,
+	getPlayerCards,
+	setPlayerScore,
+	getPlayerScore,
 
-  setLastActiveTime,
-  getLastActiveTime,
+	setLastActiveTime,
+	getLastActiveTime,
 
-  getTimer,
-  setTimer,
-  clearTimer,
+	getTimer,
+	setTimer,
+	clearTimer,
 };
