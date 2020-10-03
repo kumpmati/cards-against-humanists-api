@@ -74,10 +74,8 @@ class GameHandler {
 		this.playersList.set(sid, value);
 	}
 
-	// create new room
-	// TODO
-
-	createRoom({ room_name, room_password }) {
+	// create new room and assign a sid as the room owner
+	createRoom({ sid, room_name, room_password }) {
 		// generate random id if no name is specified
 		const room_id = room_name ? room_name : uuidv4().slice(0, 4);
 
@@ -88,6 +86,7 @@ class GameHandler {
 		const room = {
 			room_id,
 			room_password,
+			host: sid,	// set client's SID as room host
 			players: new Map(),
 			state: game.state.initialState(),
 			last_action: new Date(),

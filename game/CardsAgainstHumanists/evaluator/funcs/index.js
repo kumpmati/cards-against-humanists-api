@@ -4,9 +4,10 @@ const { status } = require("../../state/util");
 /*
  * Evaluator functions
  */
+const noAction = () => null; // nothing is done to the room
 const playersSubmitAnwsersFunc = require("./playersSubmitAnswers");
 const czarChoosesWinnerFunc = require("./czarChoosesWinner");
-const noAction = () => null; // nothing is done to the room
+const waitingForPlayers = require("./playersSubmitAnswers");
 /*
  * Match each game state with an evaluator function.
  * The keys are defined programmatically so that
@@ -14,7 +15,7 @@ const noAction = () => null; // nothing is done to the room
  * e.g. evaluatorFuncs[status.gameLoop] => gameLoopFunc
  */
 const evaluatorFuncs = {
-	[status.waitingForPlayers]: noAction,
+	[status.waitingForPlayers]: waitingForPlayers,
 	[status.startGame]: noAction,
 	[status.gameLoop]: noAction,
 	[status.playersSubmitAnwsers]: playersSubmitAnwsersFunc,

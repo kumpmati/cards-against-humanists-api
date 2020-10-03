@@ -10,6 +10,7 @@ function createRoom({ data, rtDB }) {
   if (!rtDB.getPlayer(data.sid)) return playerNotFoundErr;
 
   const result = rtDB.createRoom({
+    sid: data.sid,
     room_name: data.room_name || null,
     room_password: data.room_password || null,
   });

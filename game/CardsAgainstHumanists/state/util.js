@@ -28,6 +28,12 @@ const getRequiredCards = (room) =>
 	getCurrentQuestion(room) ? getCurrentQuestion(room).required_cards : 0;
 
 /*
+* Owner
+*/
+const getHost = (room) => room.host;
+const setHost = (room, sid) => room.host = sid.slice(0, 4);
+
+/*
  * Player
  */
 const getPlayers = (room) => Array.from(room.players.values());
@@ -86,6 +92,9 @@ const clearTimer = (room) => (room.state.timer = null);
  * Exports
  */
 module.exports = {
+	getHost,
+	setHost,
+
 	status,
 	setGameStatus,
 	getGameStatus,

@@ -40,6 +40,11 @@ module.exports = (room) => {
 	// find index of current czar
 	const players = getPlayers(room);
 	const czarIndex = players.findIndex((p) => p.sid === czarSid);
+	if (czarIndex === -1) {
+		console.log('czar not found', players);
+		return null;
+	}; 
+
 	const nextCzar = players[(czarIndex + 1) % players.length].sid;
 	setCurrentCzar(room, nextCzar);
 

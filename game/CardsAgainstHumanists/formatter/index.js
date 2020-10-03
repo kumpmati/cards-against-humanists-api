@@ -11,15 +11,15 @@ const formatterFuncs = require("./funcs");
  * e.g. other players' cards or session ids
  */
 const formatter = (room, sid) => {
-	const currentGameStatus = getGameStatus(room);
+  const currentGameStatus = getGameStatus(room);
 
-	// get the formatter function matching the current game status
-	// and fallback to the default formatter if not defined
-	const formatterFunc =
-		formatterFuncs[currentGameStatus] || formatterFuncs.default;
+  // get the formatter function matching the current game status
+  // and fallback to the default formatter if not defined
+  const formatterFunc =
+    formatterFuncs[currentGameStatus] || formatterFuncs.default;
 
-	// call the formatter and return the result
-	return formatterFunc(room, sid);
+  // call the formatter and return the result
+  return formatterFunc(room, sid);
 };
 
 module.exports = formatter;
