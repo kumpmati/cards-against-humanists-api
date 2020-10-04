@@ -3,7 +3,7 @@ const { getPlayers, setGameStatus, status } = require("../../state/util");
 /*
  * Tick function for the WAITING_FOR_PLAYERS game state
  */
-module.exports = (room) => {
+module.exports = room => {
   // do nothing, game must be started by room owner
   const players = getPlayers(room);
 

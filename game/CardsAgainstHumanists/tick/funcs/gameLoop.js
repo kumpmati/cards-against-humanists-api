@@ -1,54 +1,62 @@
-const { v4: uuidv4 } = require("uuid");
-
 const {
-	status,
-	setGameStatus,
-	setCurrentQuestion,
-	getPlayers,
-	setPlayerCards,
-	clearSubmittedCards,
-	getPlayerScore,
-	setPlayerScore,
-	getCurrentCzar,
-	setCurrentCzar,
+  status,
+  setGameStatus,
+  setCurrentQuestion,
+  getPlayers,
+  setPlayerCards,
+  clearSubmittedCards,
+  getPlayerScore,
+  setPlayerScore,
+  getCurrentCzar,
+  setCurrentCzar,
+  getPlayerCards,
 } = require("../../state/util");
 
 /*
  * Tick function for the GAME_LOOP game state
  */
-module.exports = (room) => {
-	// put a question card on the table
-	// get one question card from server
-	const [question] = room.getCards(true, 1);
-	setCurrentQuestion(room, question);
+module.exports = room => {
+  // get one question card from server
+  const [question] = room.getCards(true, 1);
+  setCurrentQuestion(room, question);
 
-	// remove any submitted cards
-	clearSubmittedCards(room);
+  // remove any submitted cards
+  clearSubmittedCards(room);
 
-	// loop through players
-	getPlayers(room).forEach(({ sid }) => {
-		// give all players 4 cards
-		setPlayerCards(room, sid, room.getCards(false, 4));
+  const players = getPlayers(room);
+  // move to waiting if not enough players
+  if (players.length < 2) {
+    setGameStatus(room, status.waitingForPlayers);
+    return room;
+  }
 
-		// set score to 0 if it doesn't exist
-		if (!getPlayerScore(room, sid)) setPlayerScore(room, sid, 0);
-	});
+  // loop through players
+  players.forEach(({ sid }) => {
+    const playerCards = getPlayerCards(room, sid) || [];
 
-	// get index of current czar
-	const czarSid = getCurrentCzar(room);
+    // get enough new cards for player to have 7 cards in total
+    const neededCardsNum = 7 - playerCards.length;
+    const newCards = room.getCards(false, neededCardsNum); // get
+    setPlayerCards(room, sid, [...playerCards, ...newCards]);
 
-	// find index of current czar
-	const players = getPlayers(room);
-	const czarIndex = players.findIndex((p) => p.sid === czarSid);
-	if (czarIndex === -1) {
-		console.log('czar not found', players);
-		return null;
-	}; 
+    // set score to 0 if it doesn't exist
+    if (!getPlayerScore(room, sid)) setPlayerScore(room, sid, 0);
+  });
 
-	const nextCzar = players[(czarIndex + 1) % players.length].sid;
-	setCurrentCzar(room, nextCzar);
+  // get index of current czar
+  const czarSid = getCurrentCzar(room);
 
-	// go to player submission state
-	setGameStatus(room, status.playersSubmitAnwsers);
-	return room;
+  // find index of current czar
+  let czarIndex = players.findIndex(p => p.sid === czarSid);
+  if (czarIndex > -1) {
+    const nextCzar = players[(czarIndex + 1) % players.length].sid;
+    setCurrentCzar(room, nextCzar);
+  } else {
+    console.log("error finding czar, defaulting to first player");
+    setCurrentCzar(room, players[0].sid);
+  }
+
+  // go to player submission state
+  setGameStatus(room, status.playersSubmitAnwsers);
+  return room;
 };
