@@ -11,7 +11,7 @@ const {
   getAllSubmittedCards,
   getCurrentCzar,
   getTimer,
-  getHost
+  getHost,
 } = require("../../state/util");
 
 const { shortSid } = require("../util");
@@ -26,9 +26,9 @@ const defaultFormatterFunc = (room, sid) => {
   // get the current czar as a player object
   const czar = getPlayer(room, getCurrentCzar(room));
 
-  // get all submitted cards and remove the text
-  const submittedCards = getAllSubmittedCards(room).map((sub) =>
-    sub.map((c) => ({ text: "", id: c.id }))
+  // hide text from all submitted cards
+  const submittedCards = getAllSubmittedCards(room).map(cards =>
+    cards.map(c => ({ text: "", id: c.id }))
   );
 
   /*
@@ -36,7 +36,7 @@ const defaultFormatterFunc = (room, sid) => {
    */
   const formattedData = {
     // only show player names and scores
-    players: players.map((player) => ({
+    players: players.map(player => ({
       name: player.name,
       id: shortSid(player.sid),
       score: getPlayerScore(room, player.sid),
