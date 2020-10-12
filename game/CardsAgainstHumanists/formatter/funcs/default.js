@@ -9,9 +9,10 @@ const {
   getGameStatus,
   getCurrentQuestion,
   getAllSubmittedCards,
+  getWinningCards,
   getCurrentCzar,
   getTimer,
-  getHost
+  getHost,
 } = require("../../state/util");
 
 const { shortSid } = require("../util");
@@ -31,7 +32,7 @@ const defaultFormatterFunc = (room, sid) => {
    */
   const formattedData = {
     // only show player names and scores
-    players: players.map((player) => ({
+    players: players.map(player => ({
       name: player.name,
       id: shortSid(player.sid),
       score: getPlayerScore(room, player.sid),
@@ -48,6 +49,7 @@ const defaultFormatterFunc = (room, sid) => {
       current_question: getCurrentQuestion(room),
       submitted_cards: getAllSubmittedCards(room),
       cards: getPlayerCards(room, sid) || [],
+      winning_cards: getWinningCards(room),
     },
   };
 

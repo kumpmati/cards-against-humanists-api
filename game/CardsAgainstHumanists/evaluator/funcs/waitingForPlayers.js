@@ -1,4 +1,4 @@
-const { getOwner, setGameStatus, status } = require("../../state/util");
+const { getHost, setGameStatus, status } = require("../../state/util");
 
 /*
  * Evaluator for the WAITING_FOR_PLAYERS game state
@@ -6,17 +6,10 @@ const { getOwner, setGameStatus, status } = require("../../state/util");
 const waitingForPlayers = (room, action) => {
   const { data, sid } = action;
 
-  // check if client is room owner
-  const isOwner = sid === getOwner(room);
-
-  // check that request is a vote request
+  const isHost = sid === getHost(room);
   const isVote = data && data.vote;
 
-  // do nothing if client is not room owner or request isn't a vote
-  if (!isOwner || !isVote) return null;
-
-  // if client is owner and is requesting to start the game
-  if (data.vote === "start") {
+  if (isHost && isVote && data.vote === "start-game") {
     setGameStatus(room, status.startGame);
     return room;
   }

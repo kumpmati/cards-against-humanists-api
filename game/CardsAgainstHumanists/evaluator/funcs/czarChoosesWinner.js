@@ -6,7 +6,7 @@ const {
   getPlayerScore,
   setGameStatus,
   clearSubmittedCards,
-  setSubmittedCards,
+  setWinningCards,
   clearTimer,
 } = require("../../state/util");
 
@@ -31,14 +31,14 @@ const czarChoosesWinnerFunc = (room, action) => {
       const score = getPlayerScore(room, submitterSid);
       setPlayerScore(room, submitterSid, score + 1);
 
-      // clear all submissions
-      clearSubmittedCards(room);
-
       // clear timer before next state
       clearTimer(room);
 
       // display the winning card(s)
-      setSubmittedCards(room, submitterSid, submittedCards);
+      setWinningCards(
+        room,
+        submittedCards.map(c => ({ id: c.id }))
+      );
 
       // go to next status
       setGameStatus(room, status.showWinner);

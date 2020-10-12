@@ -12,10 +12,14 @@ const {
  * Tick function for the PLAYERS_SUBMIT_ANSWERS game state
  */
 module.exports = room => {
-  // set timer if not set already
-  if (!getTimer(room)) setTimer(room, 60);
-
   const timer = getTimer(room);
+
+  // set timer if not set already
+  if (!timer) {
+    setTimer(room, 60);
+    return room;
+  }
+
   const submittedCards = getAllSubmittedCards(room);
   const players = getPlayers(room);
 

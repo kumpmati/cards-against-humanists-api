@@ -5,6 +5,7 @@ const {
   getPlayers,
   setPlayerCards,
   clearSubmittedCards,
+  clearWinningCards,
   getPlayerScore,
   setPlayerScore,
   getCurrentCzar,
@@ -20,17 +21,16 @@ module.exports = room => {
   const [question] = room.getCards(true, 1);
   setCurrentQuestion(room, question);
 
-  // remove any submitted cards
+  clearWinningCards(room);
   clearSubmittedCards(room);
 
   const players = getPlayers(room);
-  // move to waiting if not enough players
+  // pause game if not enough players
   if (players.length < 2) {
     setGameStatus(room, status.waitingForPlayers);
     return room;
   }
 
-  // loop through players
   players.forEach(({ sid }) => {
     const playerCards = getPlayerCards(room, sid) || [];
 
