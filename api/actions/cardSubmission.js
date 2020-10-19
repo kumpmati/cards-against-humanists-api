@@ -31,6 +31,7 @@ function cardSubmission({ data, rtDB }) {
 
     // remove whitespace around card text
     card.text = card.text.trim();
+    if (!Array.isArray(packs)) card.packs = ["all"];
 
     if (card.required_cards) {
       card.required_cards = parseInt(card.required_cards);
