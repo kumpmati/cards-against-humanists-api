@@ -14,7 +14,8 @@ module.exports = room => {
 
   // set timer if not already set
   if (!timer) {
-    setTimer(room, 5);
+    const { winnerShowTime } = room.room_options;
+    setTimer(room, winnerShowTime || 5); // default to 5s
     return room;
   }
 

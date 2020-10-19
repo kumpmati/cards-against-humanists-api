@@ -11,14 +11,23 @@ const {
   getCurrentCzar,
   setCurrentCzar,
   getPlayerCards,
+  getAnswerCard,
+  getQuestionCard,
+  resetAvailableQuestionCards,
+  resetAvailableAnswerCards,
 } = require("../../state/util");
+const { v4: uuid } = require("uuid");
 
 /*
  * Tick function for the GAME_LOOP game state
  */
-module.exports = room => {
+module.exports = async room => {
   // get one question card from server
-  const [question] = room.getCards(true, 1);
+  let question = getQuestionCard(room);
+  if (!question) {
+    resetAvailableQuestionCards(room);
+    question = getQuestionCard(room);
+  }
   setCurrentQuestion(room, question);
 
   clearWinningCards(room);
@@ -31,12 +40,27 @@ module.exports = room => {
     return room;
   }
 
+  // number of cards each player should have after each round
+  const { cardsInHand } = room.room_options;
+
   players.forEach(({ sid }) => {
     const playerCards = getPlayerCards(room, sid) || [];
+    const newCards = [];
 
-    // get enough new cards for player to have 7 cards in total
-    const neededCardsNum = 7 - playerCards.length;
-    const newCards = room.getCards(false, neededCardsNum); // get
+    // maintain number of cards defined in options but default to 7 cards
+    const neededCardsNum = (cardsInHand || 7) - playerCards.length;
+    for (let i = 0; i < neededCardsNum; i++) {
+      let card = getAnswerCard(room);
+
+      // reset cards
+      if (!card) {
+        resetAvailableAnswerCards(room);
+        card = getAnswerCard(room);
+      }
+
+      newCards.push({ ...card, id: uuid() });
+    }
+
     setPlayerCards(room, sid, [...playerCards, ...newCards]);
 
     // set score to 0 if it doesn't exist

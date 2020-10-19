@@ -20,6 +20,8 @@ const playersSubmitAnswersFunc = (room, action) => {
   const playerHasSubmitted = getSubmittedCards(room, sid);
   const correctAmountOfCards =
     dataIsValid && data.submit.length === getRequiredCards(room);
+
+  // reject submission if conditions are not met
   if (!dataIsValid || !correctAmountOfCards || playerHasSubmitted) return null;
 
   const cardsInHand = getPlayerCards(room, sid);

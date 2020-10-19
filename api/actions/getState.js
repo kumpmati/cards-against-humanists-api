@@ -2,17 +2,15 @@
  * Game
  */
 const { formatter } = require("../../game/CardsAgainstHumanists");
+const { missingParamsErr } = require("../../util/errors");
 
 // must include sid
-const validParams = (data) => !!data && !!data.sid;
+const validParams = data => !!data && !!data.sid;
 
 // GET_STATE
 function getState({ data, rtDB }) {
   if (!validParams(data)) {
-    return {
-      error: "MISSING_PARAMS",
-      data: ["sid"],
-    };
+    return missingParamsErr("sid");
   }
 
   const player = rtDB.getPlayer(data.sid);

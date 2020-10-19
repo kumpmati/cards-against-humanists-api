@@ -12,6 +12,9 @@ const leaveRoomAction = require("./leaveRoom");
 const getStateAction = require("./getState");
 const sendActionAction = require("./sendAction");
 
+const cardSubmissionAction = require("./cardSubmission");
+const getDataAction = require("./getData");
+
 const actions = {
   newSessionAction,
   validateSessionAction,
@@ -22,6 +25,9 @@ const actions = {
 
   getStateAction,
   sendActionAction,
+
+  cardSubmissionAction,
+  getDataAction,
 };
 
 /*
@@ -38,6 +44,9 @@ const types = {
   GetState: "GET_STATE",
   SendAction: "SEND_ACTION",
   Heartbeat: "HEARTBEAT", // debug
+
+  CardSubmission: "CARD_SUBMISSION",
+  GetData: "GET_DATA",
 };
 
 module.exports = { actions, types };

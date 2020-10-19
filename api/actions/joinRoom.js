@@ -1,7 +1,7 @@
 const { missingParamsErr } = require("../../util/errors");
 
 // must include sid, room_name and room_password
-const validParams = (data) => !!data && !!data.sid && !!data.room_id;
+const validParams = data => !!data && !!data.sid && !!data.room_id;
 
 // JOIN_ROOM
 function joinRoom({ data, rtDB }) {

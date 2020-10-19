@@ -73,6 +73,41 @@ const setWinningCards = (room, ids) => (room.state.winning_cards = ids);
 const clearWinningCards = room => (room.state.winning_cards = null);
 
 /*
+ * Cards
+ */
+const getAnswerCard = room => {
+  const arr = room.state.cards.answers;
+  const i = ~~(Math.random() * arr.length - 1);
+  const [card] = arr.splice(i, 1);
+  room.state.used_cards.answers.push(card);
+  return card;
+};
+
+const getQuestionCard = room => {
+  const arr = room.state.cards.questions;
+  const i = ~~(Math.random() * arr.length - 1);
+  const [card] = arr.splice(i, 1);
+  room.state.used_cards.questions.push(card);
+  return card;
+};
+
+const setAvailableCards = (room, cards) => (room.state.cards = cards);
+const resetAvailableCards = room => {
+  resetAvailableQuestionCards(room);
+  resetAvailableAnswerCards(room);
+};
+const resetAvailableAnswerCards = room => {
+  const { answers } = room.state.used_cards;
+  room.state.cards.answers.push(...answers);
+  room.state.used_cards.answers = [];
+};
+const resetAvailableQuestionCards = room => {
+  const { questions } = room.state.used_cards;
+  room.state.cards.questions.push(...questions);
+  room.state.used_cards.questions = [];
+};
+
+/*
  * Czar
  */
 const setCurrentCzar = (room, sid) => (room.state.current_czar = sid);
@@ -122,6 +157,13 @@ module.exports = {
   getAllSubmittedCards,
   getAllSubmissions,
   setSubmittedCards,
+
+  getQuestionCard,
+  getAnswerCard,
+  setAvailableCards,
+  resetAvailableCards,
+  resetAvailableAnswerCards,
+  resetAvailableQuestionCards,
 
   getPlayer,
   getPlayers,

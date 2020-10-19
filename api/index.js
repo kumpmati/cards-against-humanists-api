@@ -27,6 +27,12 @@ function executeAction({ data, socket, rtDB }) {
     case types.SendAction:
       return actions.sendActionAction(params);
 
+    case types.CardSubmission:
+      return actions.cardSubmissionAction(params);
+
+    case types.GetData:
+      return actions.getDataAction(params);
+
     default:
       return {
         error: "INVALID_TYPE",

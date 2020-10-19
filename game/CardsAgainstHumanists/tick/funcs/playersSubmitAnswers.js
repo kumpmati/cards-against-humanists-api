@@ -13,10 +13,10 @@ const {
  */
 module.exports = room => {
   const timer = getTimer(room);
-
   // set timer if not set already
   if (!timer) {
-    setTimer(room, 60);
+    const { answerTime } = room.room_options;
+    setTimer(room, answerTime || 60); // default to 60s
     return room;
   }
 

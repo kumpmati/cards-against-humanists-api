@@ -18,6 +18,16 @@ const wrongPassErr = {
   data: "Wrong password",
 };
 
+const invalidRequestErr = msg => ({
+  error: "INVALID_REQUEST",
+  data: msg,
+});
+
+const invalidCardsErr = msg => ({
+  error: "INVALID_INFO",
+  data: `Invalid format: ${msg}`,
+});
+
 const missingParamsErr = (...arr) => ({ error: "MISSING_PARAMS", data: arr });
 
 module.exports = {
@@ -26,4 +36,6 @@ module.exports = {
   wrongPassErr,
   missingParamsErr,
   roomAlreadyExistsErr,
+  invalidCardsErr,
+  invalidRequestErr,
 };

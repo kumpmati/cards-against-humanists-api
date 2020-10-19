@@ -24,9 +24,13 @@ class GameHandler {
     this.config = config;
     this.db = db;
 
-    // arrays of cards
-    this.answerCards = [];
-    this.questionCards = [];
+    this.answerRef = this.db.collection(this.config.answers);
+    this.questionRef = this.db.collection(this.config.questions);
+
+    this.cards = {
+      answers: [],
+      questions: [],
+    };
 
     // in-memory maps of players and rooms
     this.playersList = new Map();
@@ -37,7 +41,7 @@ class GameHandler {
 
     this.startGameLoop();
     this.startCleanupLoop();
-    this.fetchCards();
+    this.loadCardsToMemory();
   }
 
   // expose event listener
@@ -75,7 +79,7 @@ class GameHandler {
   }
 
   // create new room and assign a sid as the room owner
-  createRoom({ sid, room_name, room_password }) {
+  async createRoom({ sid, room_name, room_password, room_options = {} }) {
     // generate random id if no name is specified
     const room_id = room_name ? room_name : uuidv4().slice(0, 4);
 
@@ -86,11 +90,12 @@ class GameHandler {
     const room = {
       room_id,
       room_password,
+      room_options,
       host: sid, // set client's SID as room host
       players: new Map(),
       state: game.state.initialState(),
       last_action: new Date(),
-      getCards: (question, amount) => this.getCards(question, amount),
+      getCards: packs => this.getCardPacksLocal(packs),
     };
 
     // send an update event
@@ -187,9 +192,9 @@ class GameHandler {
   startGameLoop() {
     setInterval(
       () =>
-        this.roomsList.forEach((room, room_id) => {
+        this.roomsList.forEach(async (room, room_id) => {
           try {
-            const newState = game.tick(room);
+            const newState = await game.tick(room);
             // only broadcast if the current tick resulted in an update
             if (!!newState) this.updateRoom({ room_id, room: newState });
           } catch (e) {
@@ -234,31 +239,37 @@ class GameHandler {
     }, INACTIVE_SWEEP_INTERVAL * 1000);
   }
 
-  fetchCards() {
-    const ansRef = this.db.ref(this.config.answers);
-    const queRef = this.db.ref(this.config.questions);
+  // gets cards by pack locally
+  getCardPacksLocal(packs) {
+    const isSubArray = (inner, outer) =>
+      inner.every(item => outer.includes(item));
 
-    // update arrays when card db is updated
-    ansRef.on("value", d => (this.answerCards = d.val()));
-    queRef.on("value", d => (this.questionCards = d.val()));
+    const cards = {
+      answers: this.cards.answers.filter(c => isSubArray(packs, c.packs)),
+      questions: this.cards.questions.filter(c => isSubArray(packs, c.packs)),
+    };
+
+    return cards;
   }
 
-  /*
-   * Function to get <amount> of cards of <question> type
-   */
-  getCards(question, amount) {
-    let arr = [];
-    const fromArr = !!question ? this.questionCards : this.answerCards;
-    const l = fromArr.length;
+  // fetches all cards in a single pack or multiple packs from the server
+  async getAllCards() {
+    const cards = { answers: [], questions: [] };
 
-    while (arr.length < amount) {
-      const randomIndex = ~~(Math.random() * l);
-      const card = fromArr[randomIndex];
-      // add random id to card
-      arr.push({ ...card, id: uuidv4() });
-    }
+    // get all answer cards in pack
+    const answers = await this.answerRef.get();
+    answers.forEach(c => cards.answers.push(c.data()));
 
-    return arr;
+    // get all question cards in pack
+    const questions = await this.questionRef.get();
+    questions.forEach(c => cards.questions.push(c.data()));
+
+    return cards;
+  }
+
+  async loadCardsToMemory() {
+    const cards = await this.getAllCards();
+    this.cards = cards;
   }
 }
 

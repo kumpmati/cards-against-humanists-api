@@ -31,6 +31,18 @@ const initialState = () => ({
 
   // timer
   timer: null,
+
+  // cards available for play
+  cards: {
+    answers: [],
+    questions: [],
+  },
+
+  // cards that have already been played
+  used_cards: {
+    answers: [],
+    questions: [],
+  },
 });
 
 module.exports = initialState;

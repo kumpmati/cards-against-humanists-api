@@ -1,10 +1,10 @@
 const { executeAction } = require("../api");
 
 // data must contain id, data and type
-const validData = (data) => !!data && !!data.id && !!data.data && !!data.type;
+const validData = data => !!data && !!data.id && !!data.data && !!data.type;
 
 function socketHandler({ socket, game }) {
-  socket.on("data", async (incomingData) => {
+  socket.on("data", async incomingData => {
     const { id, type, data } = incomingData;
 
     let response = null;
@@ -13,6 +13,7 @@ function socketHandler({ socket, game }) {
     if (validData(incomingData)) {
       try {
         const message = { type, data };
+        // treat every actions as async
         response = await executeAction({ data: message, socket, rtDB: game });
       } catch (err) {
         console.error(err);
