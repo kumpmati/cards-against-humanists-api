@@ -1,5 +1,5 @@
 // must include sid
-const validParams = (data) => !!data && !!data.sid && !!data.data;
+const validParams = data => !!data && !!data.sid && !!data.data;
 
 // SEND_ACTION
 function sendAction({ data, rtDB }) {

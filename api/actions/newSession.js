@@ -1,7 +1,7 @@
 const { v5: uuidv5 } = require("uuid");
 
-const validParams = (data) => !!data && !!data.name;
-const validName = (s) => s.trim() !== "" && s.trim().length >= 1;
+const validParams = data => !!data && !!data.name;
+const validName = s => s.trim() !== "" && s.trim().length >= 1;
 
 // NEW_SESSION
 function newSession({ data, rtDB, socket }) {

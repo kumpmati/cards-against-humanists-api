@@ -4,7 +4,7 @@ const cors = require("cors");
 
 // server loader
 // starts up express and socket.io
-module.exports = (config) => {
+module.exports = config => {
   if (!config || !config.PORT) {
     throw new Error("invalid config: no port number specified");
   }

@@ -252,24 +252,25 @@ class GameHandler {
     return cards;
   }
 
-  // fetches all cards in a single pack or multiple packs from the server
-  async getAllCards() {
-    const cards = { answers: [], questions: [] };
-
-    // get all answer cards in pack
-    const answers = await this.answerRef.get();
-    answers.forEach(c => cards.answers.push(c.data()));
-
-    // get all question cards in pack
-    const questions = await this.questionRef.get();
-    questions.forEach(c => cards.questions.push(c.data()));
-
-    return cards;
-  }
-
+  // loads database of cards into memory, and listens to any future changes
   async loadCardsToMemory() {
-    const cards = await this.getAllCards();
-    this.cards = cards;
+    this.answerRef.onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === "added") {
+          const newCard = change.doc.data();
+          this.cards.answers.push(newCard);
+        }
+      });
+    });
+
+    this.questionRef.onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === "added") {
+          const newCard = change.doc.data();
+          this.cards.questions.push(newCard);
+        }
+      });
+    });
   }
 }
 

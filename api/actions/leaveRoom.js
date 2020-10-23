@@ -1,5 +1,5 @@
 // must include sid and room_name
-const validParams = (data) => !!data && !!data.sid;
+const validParams = data => !!data && !!data.sid;
 
 // LEAVE_ROOM
 function leaveRoom({ data, rtDB }) {

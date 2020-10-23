@@ -1,4 +1,4 @@
-const validParams = (data) => !!data && !!data.sid;
+const validParams = data => !!data && !!data.sid;
 
 // VALIDATE_SESSION
 function validateSession({ data, rtDB, socket }) {
