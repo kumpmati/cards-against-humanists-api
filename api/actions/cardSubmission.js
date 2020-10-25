@@ -4,7 +4,7 @@ const { missingParamsErr, invalidCardsErr } = require("../../util/errors");
 const validParams = data => !!data && !!data.cards;
 
 const MAX_REQUIRED_CARDS = 3;
-const MAX_TEXT_LENGTH = 50;
+const MAX_TEXT_LENGTH = 100;
 
 // CARD_SUBMISSION
 function cardSubmission({ data, rtDB }) {
