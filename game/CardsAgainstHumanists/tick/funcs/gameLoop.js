@@ -25,7 +25,6 @@ const endGame = require("./endGame");
  */
 module.exports = async room => {
   increaseRound(room);
-  console.log(room.state.round)
   if(room.state.round > 10) {
     setGameStatus(room, status.endGame);
     return room;
