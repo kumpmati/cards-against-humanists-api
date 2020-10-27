@@ -32,6 +32,8 @@ const initialState = () => ({
   // timer
   timer: null,
 
+  round: 0,
+
   // cards available for play
   cards: {
     answers: [],

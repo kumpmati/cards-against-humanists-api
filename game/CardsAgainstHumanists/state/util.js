@@ -118,6 +118,7 @@ const getCurrentCzar = room => room.state.current_czar;
  */
 const getLastActiveTime = room => room.state.last_time_active;
 const setLastActiveTime = room => (room.state.last_time_active = new Date());
+const increaseRound = room => room.state.round++;
 
 /*
  * Timer
@@ -174,6 +175,7 @@ module.exports = {
 
   setLastActiveTime,
   getLastActiveTime,
+  increaseRound,
 
   getTimer,
   setTimer,

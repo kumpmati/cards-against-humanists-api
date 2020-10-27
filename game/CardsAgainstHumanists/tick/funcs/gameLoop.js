@@ -15,13 +15,18 @@ const {
   getQuestionCard,
   resetAvailableQuestionCards,
   resetAvailableAnswerCards,
+  increaseRound,
 } = require("../../state/util");
 const { v4: uuid } = require("uuid");
+const endGame = require("./endGame");
 
 /*
  * Tick function for the GAME_LOOP game state
  */
 module.exports = async room => {
+  increaseRound(room);
+  console.log(room.state.round)
+  if(room.state.round > 10) setGameStatus(room, status.endGame);
   // get one question card from server
   let question = getQuestionCard(room);
   if (!question) {
