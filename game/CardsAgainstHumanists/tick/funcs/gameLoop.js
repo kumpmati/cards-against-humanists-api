@@ -26,7 +26,10 @@ const endGame = require("./endGame");
 module.exports = async room => {
   increaseRound(room);
   console.log(room.state.round)
-  if(room.state.round > 10) setGameStatus(room, status.endGame);
+  if(room.state.round > 10) {
+    setGameStatus(room, status.endGame);
+    return room;
+  }
   // get one question card from server
   let question = getQuestionCard(room);
   if (!question) {
