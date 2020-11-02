@@ -1,5 +1,6 @@
 # nodejs module folder
 node_modules/
+.DS_STORE
 
 # environment variables
 .env
