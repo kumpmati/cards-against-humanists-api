@@ -1,0 +1,37 @@
+{
+  "name": "cards-against-humanists-api",
+  "version": "1.0.0",
+  "description": "Cards Against Humanists Api",
+  "main": "index.js",
+  "scripts": {
+    "start": "node out/index.js",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kumpmati/cards-against-humanists-api.git"
+  },
+  "keywords": [
+    "node.js",
+    "typescript",
+    "socket.io"
+  ],
+  "author": "Matias Kumpulainen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kumpmati/cards-against-humanists-api/issues"
+  },
+  "homepage": "https://github.com/kumpmati/cards-against-humanists-api#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.11",
+    "@types/node": "^14.14.31",
+    "@types/socket.io": "^2.1.13",
+    "typescript": "^4.2.2"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "socket.io": "^3.1.2"
+  }
+}
