@@ -1,4 +1,4 @@
-import { Event } from "../../events";
+import { Event } from "../../event";
 
 export class GameController {
   private readonly onCreateGame = new Event<CreateGameEvent>();

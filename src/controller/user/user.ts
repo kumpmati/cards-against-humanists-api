@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import { Event, TypedEvent } from "../../events";
+import { Event, TypedEvent } from "../../event";
 
 export class UserController<E, T> {
   private socket: Socket;
