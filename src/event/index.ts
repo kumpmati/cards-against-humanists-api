@@ -28,10 +28,8 @@ export class TypedEvent<E, T> implements TypedEventInterface<E, T> {
   private handlers = new Map<E, Set<Handler<T>>>();
 
   public on = (event: E, handler: Handler<T>): void => {
-    const _set = this.handlers.has(event)
-      ? this.handlers.get(event)
-      : new Set<Handler<T>>();
-
+    if (!this.handlers.has(event)) this.handlers.set(event, new Set());
+    const _set = this.handlers.get(event);
     _set.add(handler);
   };
 
