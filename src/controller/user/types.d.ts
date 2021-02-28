@@ -1,9 +1,2 @@
-import { Socket } from "socket.io";
-
-interface JoinGameEvent {}
-interface LeaveGameEvent {}
-
-interface SocketMessageEvent<T> {
-  socket: Socket;
-  message: T;
-}
+export interface JoinGameEvent {}
+export interface LeaveGameEvent {}
