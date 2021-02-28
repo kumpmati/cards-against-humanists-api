@@ -1,4 +1,11 @@
-export const start = (dev: boolean) => {
-  if (dev) console.warn("Starting in development mode");
-  console.log("server starting...");
+import { DEFAULT_CONFIG } from "../config";
+import { startSocketIO } from "./socketio";
+
+/**
+ * Starts the server
+ */
+export const start = () => {
+  console.log("starting server...");
+
+  startSocketIO(DEFAULT_CONFIG);
 };
