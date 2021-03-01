@@ -1,4 +1,5 @@
 import { Socket } from "socket.io";
+import { v4 } from "uuid";
 import { GameController } from "../../controller/game/game";
 import { UserController } from "../../controller/user/user";
 import { Game } from "../types";
@@ -11,10 +12,12 @@ import { Game } from "../types";
 export class Cahum implements Game {
   private users: Set<UserController<CahumEventTypes, CahumEvent>>;
   private readonly gameController;
+  private readonly gameID;
 
-  constructor() {
+  constructor(gameID: string) {
     this.gameController = new GameController();
     this.users = new Set<UserController<CahumEventTypes, CahumEvent>>();
+    this.gameID = gameID;
   }
 
   public start = () => {
@@ -32,6 +35,8 @@ export class Cahum implements Game {
   public handleSocket = (s: Socket) => {
     const user = new UserController<CahumEventTypes, CahumEvent>(s);
 
+    user.Send(CahumEventTypes.Message, { userID: v4() });
+    user.Event.on(CahumEventTypes.Message, console.log);
     this.users.add(user);
   };
 }
@@ -40,4 +45,6 @@ export enum CahumEventTypes {
   Message = "msg",
 }
 
-export interface CahumEvent {}
+export interface CahumEvent {
+  userID: string;
+}

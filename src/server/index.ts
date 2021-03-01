@@ -1,15 +1,20 @@
+import { v4 } from "uuid";
 import { DEFAULT_CONFIG } from "../config";
 import { Cahum } from "../game/cahum";
+import { startExpress } from "./express";
 import { startSocketIO } from "./socketio";
 
-export const start = () => {
-  console.log("starting server...");
+export const start = async () => {
+  console.log("---- Server starting ----");
 
-  const io = startSocketIO(DEFAULT_CONFIG);
+  const http = await startExpress(DEFAULT_CONFIG);
+  const io = startSocketIO(http, DEFAULT_CONFIG);
 
-  const game = new Cahum();
+  const gameID = v4().substr(0, 4);
+  const game = new Cahum(gameID);
+
+  // put everyone that connects to the cahum namespace in the same game.
+  // NOTE: THIS WILL CHANGE.
   const namespace = io.of("cahum");
-
-  // put everyone that connects to the cahum namespace in the same game
   namespace.on("connection", game.handleSocket);
 };
