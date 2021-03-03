@@ -5,12 +5,12 @@ import {
   isCahumCreateOptions,
   isCahumJoinOptions,
 } from "../../../game/cahum";
+import { createAuthToken } from "../../../service/auth";
 
 /**
  * Route: /api/game
  */
 export const gameRouter = Router();
-gameRouter.use(express.json());
 
 /**
  * POST: /api/game/create
@@ -24,8 +24,12 @@ gameRouter.post("/create", (req, res) => {
   const opts = req.body;
   const game = createGame(Cahum, opts);
 
-  console.log(game);
-  res.json({ roomCode: game.getID() });
+  try {
+    const token = createAuthToken(game.getID()); // unique token to auth user when joining
+    res.json(token);
+  } catch (e) {
+    res.json({ error: e.message });
+  }
 });
 
 /**
@@ -38,13 +42,9 @@ gameRouter.post("/join", (req, res) => {
   }
 
   try {
-    const opts = req.body;
-    const game = getGame(opts.id);
-
-    console.log(game);
-    res.json({ join: "success" });
+    const game = getGame(req.body.roomCode);
+    res.json({ join: game.getID() });
   } catch (e) {
-    console.error(e);
-    res.json({ error: "Game not found" });
+    res.json({ error: e.message });
   }
 });

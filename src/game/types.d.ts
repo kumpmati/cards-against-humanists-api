@@ -7,4 +7,4 @@ export interface Game {
   getID: () => string;
 }
 
-export type GameType<T> = new (...args: any[]) => T;
+export type GameType<T, O> = new (id: string, opts: O) => T;

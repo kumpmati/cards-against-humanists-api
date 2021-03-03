@@ -10,6 +10,7 @@ export const startExpress = async (config: Config): Promise<HTTPServer> => {
 
     const app = express();
     app.use(cors()); // TODO: more strict CORS settings
+    app.use(express.json());
     app.use("/api", apiRoutes);
 
     const http = new HTTPServer(app);

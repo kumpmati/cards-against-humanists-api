@@ -43,12 +43,7 @@ export class Cahum implements Game {
    * @param s Socket
    */
   public handleSocket = (s: Socket) => {
-    const id = v4();
-    const user = new UserController<CahumEventTypes, CahumEvent>(s, id);
-
-    user.Send(CahumEventTypes.Message, { userID: v4() });
-    user.Event.on(CahumEventTypes.Message, console.log);
-    this.users.add(user);
+    // TODO: handle user
   };
 
   /**
@@ -60,7 +55,7 @@ export class Cahum implements Game {
 
 export interface CahumCreateSettings {
   password: string;
-  cardPacks: string[];
+  packs: string[];
   czarReveals: boolean;
   shuffleAnswers: boolean;
 }
@@ -70,24 +65,19 @@ export const isCahumCreateOptions = (o: unknown): o is CahumCreateSettings => {
     o != null &&
     typeof o === "object" &&
     o.hasOwnProperty("password") &&
-    o.hasOwnProperty("cardPacks") &&
+    o.hasOwnProperty("packs") &&
     o.hasOwnProperty("czarReveals") &&
     o.hasOwnProperty("shuffleAnswers")
   );
 };
 
 export interface CahumJoinOptions {
-  id: string;
-  password: string;
+  roomCode: string;
+  password?: string;
 }
 
 export const isCahumJoinOptions = (o: unknown): o is CahumJoinOptions => {
-  return (
-    o != null &&
-    typeof o === "object" &&
-    o.hasOwnProperty("id") &&
-    o.hasOwnProperty("password")
-  );
+  return o != null && typeof o === "object" && o.hasOwnProperty("roomCode");
 };
 
 export enum CahumEventTypes {
