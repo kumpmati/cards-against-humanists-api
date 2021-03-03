@@ -1,11 +1,11 @@
-import express, { Router } from "express";
-import { createGame, getGame } from "../../../game";
+import { Router } from "express";
+import { createGame, gameExists, getGame } from "../../../service/game";
 import {
   Cahum,
-  isCahumCreateOptions,
+  isCahumCreateSettings,
   isCahumJoinOptions,
 } from "../../../game/cahum";
-import { createAuthToken } from "../../../service/auth";
+import { createAuthToken, updateAuthToken } from "../../../service/auth";
 
 /**
  * Route: /api/game
@@ -16,7 +16,7 @@ export const gameRouter = Router();
  * POST: /api/game/create
  */
 gameRouter.post("/create", (req, res) => {
-  if (!isCahumCreateOptions(req.body)) {
+  if (!isCahumCreateSettings(req.body)) {
     res.json({ error: "invalid request" });
     return;
   }
@@ -26,6 +26,8 @@ gameRouter.post("/create", (req, res) => {
 
   try {
     const token = createAuthToken(game.getID()); // unique token to auth user when joining
+    game.setHost(token.token);
+
     res.json(token);
   } catch (e) {
     res.json({ error: e.message });
@@ -42,8 +44,22 @@ gameRouter.post("/join", (req, res) => {
   }
 
   try {
-    const game = getGame(req.body.roomCode);
-    res.json({ join: game.getID() });
+    const { roomCode, token, password } = req.body;
+    const game = getGame(roomCode);
+
+    const gamePassword = game.getOptions().password;
+    if (gamePassword && !password) {
+      res.json({ action: "password_needed" });
+      return;
+    } else if (gamePassword && password !== gamePassword) {
+      throw new Error("Invalid password");
+    }
+
+    const newToken = token
+      ? updateAuthToken(token.token, game.getID())
+      : createAuthToken(game.getID());
+
+    res.json(newToken);
   } catch (e) {
     res.json({ error: e.message });
   }

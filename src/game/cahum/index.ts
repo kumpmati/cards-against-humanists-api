@@ -1,7 +1,8 @@
 import { Socket } from "socket.io";
-import { v4 } from "uuid";
+
 import { GameController } from "../../controller/game/game";
 import { UserController } from "../../controller/user/user";
+import { AuthToken } from "../../service/auth/types";
 import { Game } from "../types";
 
 type CahumUserController = UserController<CahumEventTypes, CahumEvent>;
@@ -12,10 +13,12 @@ type CahumUserController = UserController<CahumEventTypes, CahumEvent>;
  * and each active game or room should have its own instance.
  */
 export class Cahum implements Game {
-  private users: Set<CahumUserController>;
   private readonly gameController;
   private readonly gameID;
   private readonly options;
+
+  private users: Set<CahumUserController>;
+  private host: string = null;
 
   /**
    * Instantiates the game class, setting up the GameController.
@@ -47,10 +50,25 @@ export class Cahum implements Game {
   };
 
   /**
+   * Sets the token of the current host
+   * @param token Token
+   */
+  public setHost = (token: string) => {
+    this.host = token;
+  };
+
+  /**
+   * Returns the token of the current host
+   */
+  public getHost = () => this.host;
+
+  /**
    * Returns the game's ID.
    * This ID can be used to find the game in the list of active games.
    */
   public getID = () => this.gameID;
+
+  public getOptions = () => this.options;
 }
 
 export interface CahumCreateSettings {
@@ -60,7 +78,7 @@ export interface CahumCreateSettings {
   shuffleAnswers: boolean;
 }
 
-export const isCahumCreateOptions = (o: unknown): o is CahumCreateSettings => {
+export const isCahumCreateSettings = (o: unknown): o is CahumCreateSettings => {
   return (
     o != null &&
     typeof o === "object" &&
@@ -74,6 +92,7 @@ export const isCahumCreateOptions = (o: unknown): o is CahumCreateSettings => {
 export interface CahumJoinOptions {
   roomCode: string;
   password?: string;
+  token?: AuthToken;
 }
 
 export const isCahumJoinOptions = (o: unknown): o is CahumJoinOptions => {

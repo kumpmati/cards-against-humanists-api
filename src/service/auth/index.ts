@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { gameExists } from "../../game";
+import { gameExists } from "../game";
 import { AuthToken } from "./types";
 
 /**
@@ -17,6 +17,20 @@ export const createAuthToken = (gameID: string): AuthToken => {
   if (!gameExists(gameID)) throw new Error("Game not found");
 
   const token = v4();
+  authTokens.set(token, gameID);
+
+  return { gameID, token };
+};
+
+/**
+ * Updates the game of an existing auth token
+ * @param token Token
+ * @param gameID ID of the game to associate token with
+ */
+export const updateAuthToken = (token: string, gameID: string): AuthToken => {
+  if (!gameExists(gameID)) throw new Error("Game not found");
+  if (!authTokens.has(token)) return createAuthToken(gameID);
+
   authTokens.set(token, gameID);
 
   return { gameID, token };

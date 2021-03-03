@@ -1,23 +1,43 @@
+import { Server as SocketIOServer } from "socket.io";
 import { Socket } from "socket.io";
+import { cahumLobbyHandler } from "../../game/cahum/lobby";
 import { isAuthToken, validate } from "../auth";
+import { getGame } from "../game";
 
 /**
- * Handles events coming from a socket.
- * Used as the connection handler for namespace "lobby"
+ * Handles clients connecting to the 'lobby' namespace
+ * @param io Socket.IO server instance
+ */
+export const startLobbyService = (io: SocketIOServer) => {
+  const lobby = io.of("lobby");
+  lobby.on("connection", lobbySocketHandler);
+};
+
+/**
+ * Handles authentication of the socket.
+ * After successful authentication the
  * @param s Socket
  */
-export const lobbySocketHandler = (s: Socket) => {
+const lobbySocketHandler = (s: Socket) => {
   s.on("auth", (token: any) => handleAuth(s, token));
 };
 
-const handleAuth = (s: Socket, token: any) => {
+/**
+ * Handles lobby 'auth' events
+ * @param s Socket
+ * @param token AuthToken
+ */
+const handleAuth = async (s: Socket, token: unknown) => {
   if (!isAuthToken(token)) {
     s.emit("error", "No token provided");
     return;
   }
 
   if (validate(token)) {
-    s.emit("msg", "Authenticated");
+    await s.join(token.gameID);
+
+    const game = getGame(token.gameID);
+    cahumLobbyHandler(s, game); // handle socket using the cahum lobby handler
     return;
   }
 

@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { Game, GameType } from "./types";
+import { Game, GameType } from "../../game/types";
 
 /**
  * Map of all active games.
