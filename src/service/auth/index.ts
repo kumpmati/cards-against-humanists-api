@@ -29,7 +29,12 @@ export const createAuthToken = (gameID: string): AuthToken => {
  */
 export const updateAuthToken = (token: string, gameID: string): AuthToken => {
   if (!gameExists(gameID)) throw new Error("Game not found");
-  if (!authTokens.has(token)) return createAuthToken(gameID);
+
+  // prevent users choosing their own tokens for security reasons
+  if (!authTokens.has(token)) {
+    createAuthToken(gameID);
+    return;
+  }
 
   authTokens.set(token, gameID);
 

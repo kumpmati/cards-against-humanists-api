@@ -35,6 +35,7 @@ const handleAuth = async (s: Socket, token: unknown) => {
 
   if (validate(token)) {
     await s.join(token.gameID);
+    s.emit("auth", token);
 
     const game = getGame(token.gameID);
     cahumLobbyHandler(s, game); // handle socket using the cahum lobby handler

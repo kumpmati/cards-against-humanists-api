@@ -17,8 +17,8 @@ export const cahumLobbyHandler = (s: Socket, game: Game) => {
 const handleMessage = (s: Socket, text: any) => {
   if (typeof text !== "string") return;
 
-  s.emit("message", text);
   s.rooms.forEach(room => s.to(room).emit("message", text));
+  s.emit("message", text);
 };
 
 /**
