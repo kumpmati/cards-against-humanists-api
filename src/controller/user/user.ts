@@ -4,12 +4,14 @@ import { JoinGameEvent, LeaveGameEvent } from "./types";
 
 export class UserController<E extends string, T> {
   private socket: Socket;
+  private readonly id: string;
 
   private readonly onJoinGame = new Event<JoinGameEvent>();
   private readonly onLeaveGame = new Event<LeaveGameEvent>();
   private readonly onEvent = new TypedEvent<E, T>();
 
-  constructor(s: Socket) {
+  constructor(s: Socket, id: string) {
+    this.id = id;
     this.socket = s;
     this.socket.onAny(this.onEvent.trigger);
   }
