@@ -1,5 +1,5 @@
-interface CreateGameEvent {}
-interface DeleteGameEvent {}
-interface PlayerJoinEvent {}
-interface PlayerLeaveEvent {}
-interface PlayerEvent {}
+export interface CreateGameEvent {}
+export interface DeleteGameEvent {}
+export interface PlayerJoinEvent {}
+export interface PlayerLeaveEvent {}
+export interface PlayerEvent {}

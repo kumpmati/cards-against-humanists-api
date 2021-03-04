@@ -1,4 +1,11 @@
 import { Event } from "../../event";
+import {
+  CreateGameEvent,
+  DeleteGameEvent,
+  PlayerEvent,
+  PlayerJoinEvent,
+  PlayerLeaveEvent,
+} from "./types";
 
 export class GameController {
   private readonly onCreateGame = new Event<CreateGameEvent>();
