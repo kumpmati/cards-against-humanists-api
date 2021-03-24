@@ -5,5 +5,5 @@ env(); // load environment variables
 
 export const DEFAULT_CONFIG: Config = {
   dev: process.env.ENV === "development",
-  port: +process.env.PORT || 9000,
+  port: parseInt(process.env.PORT) || 9000,
 };
