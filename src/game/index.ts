@@ -1,4 +1,6 @@
 import { Game } from "boardgame.io";
+import play from "./phases/play";
+import waitForPlayers from "./phases/waitForPlayers";
 
 export const Cahum: Game = {
   name: "cahum",
@@ -7,7 +9,11 @@ export const Cahum: Game = {
   // setupData is an optional custom object that is
   // passed through the Game Creation API.
   setup: (ctx, setupData) => {
-    return { hello: "world" };
+    console.log(setupData);
+    return {
+      table: [],
+      players: {},
+    };
   },
 
   // Optional function to validate the setupData before
@@ -27,12 +33,15 @@ export const Cahum: Game = {
   // The seed used by the pseudo-random number generator.
   seed: "teekkarilakki",
 
-  phases: {},
+  phases: {
+    waitForPlayers: waitForPlayers,
+    play: play,
+  },
 
-  // Disable undo feature for all the moves in the game
   disableUndo: true,
 };
 
 const isSetupData = (data: any): data is SetupData => typeof data === "object";
 
+// TODO: more complicated setup data
 interface SetupData {}
