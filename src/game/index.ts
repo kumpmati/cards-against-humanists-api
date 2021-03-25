@@ -9,9 +9,10 @@ export const Cahum: Game = {
   // setupData is an optional custom object that is
   // passed through the Game Creation API.
   setup: (ctx, setupData) => {
-    console.log(setupData);
     return {
-      table: [],
+      deck: [], // holds all cards that player can draw
+      table: [], // holds all submitted cards
+
       players: {},
     };
   },
