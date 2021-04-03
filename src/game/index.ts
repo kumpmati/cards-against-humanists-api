@@ -2,6 +2,9 @@ import { Game } from "boardgame.io";
 import play from "./phases/play";
 import waitForPlayers from "./phases/waitForPlayers";
 
+/**
+ * Cards Against Humanists
+ */
 export const Cahum: Game = {
   name: "cahum",
 

@@ -1,28 +1,35 @@
 import { PhaseConfig } from "boardgame.io";
+import { chooseWinner, submitAnswer } from "./moves";
 
-// Winner choosing phase
+/**
+ * Phase where the actual gameplay happens
+ */
 const play: PhaseConfig = {
   turn: {
     stages: {
-      // stage where players other than the Czar choose their cards
+      // players other than the Czar submit their answers
       chooseCard: {
         moves: {
-          chooseCard: () => {},
+          submitAnswer,
         },
       },
 
-      // stage where Czar picks the winner
+      // Czar picks the winner
       pickWinner: {
         moves: {
-          pickWinner: () => {},
+          chooseWinner,
         },
       },
 
-      // stage where the Czar waits for the other players to choose their cards
-      waitForOthers: {},
+      // Czar waits for the other players to choose their cards
+      waitForOthers: {
+        moves: {},
+      },
 
-      // stage where the other players wait for the czar to pick the winner
-      waitForCzar: {},
+      // players wait for the Czar to pick the winner
+      waitForCzar: {
+        moves: {},
+      },
     },
   },
 };
