@@ -13,7 +13,7 @@ export const Cahum: Game = {
   // passed through the Game Creation API.
   setup: (ctx, setupData) => {
     return {
-      deck: [], // holds all cards that player can draw
+      deck: [], // holds all the cards available in the game
       table: [], // holds all submitted cards
 
       players: {},
