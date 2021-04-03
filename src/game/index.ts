@@ -35,8 +35,8 @@ export const Cahum: Game = {
   seed: "teekkarilakki",
 
   phases: {
-    waitForPlayers: waitForPlayers,
-    play: play,
+    waitForPlayers,
+    play,
   },
 
   disableUndo: true,

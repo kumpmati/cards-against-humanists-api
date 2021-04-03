@@ -1,11 +1,7 @@
 import { PhaseConfig } from "boardgame.io";
-import { pickWinnerCard } from "../moves";
 
 // Winner choosing phase
 const play: PhaseConfig = {
-  moves: {
-    pickWinnerCard,
-  },
   turn: {
     stages: {
       // stage where players other than the Czar choose their cards
