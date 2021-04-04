@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import { DEFAULT_CONFIG } from "../config";
 import { Config } from "../config/config";
-import { Card, CardPack } from "../game/types";
+import { AnswerCard, CardPack, QuestionCard } from "../game/types";
 import { dbHelpers } from "../helpers/db";
 
 /**
@@ -30,22 +30,56 @@ class Database {
    * Loads all cards into memory from the database.
    */
   async load() {
-    console.log("Loading cards...");
+    console.log("Loading cards");
 
-    const packs = (await this.db.packs.get()).docs.map((d) => d.data());
-    packs.forEach((pack) => {
-      this.cardPacks.set(pack.name, pack);
-    });
+    const answers = (await this.db.answers.get()).docs.map((d) => d.data());
+    const questions = (await this.db.questions.get()).docs.map((d) => d.data());
+
+    for (const card of answers) {
+      if (!this.cardPacks.has(card.pack)) {
+        this.cardPacks.set(card.pack, createCardPack(card.pack));
+      }
+
+      this.cardPacks.get(card.pack).answers.push(card);
+    }
+
+    for (const card of questions) {
+      if (!this.cardPacks.has(card.pack)) {
+        this.cardPacks.set(card.pack, createCardPack(card.pack));
+      }
+
+      this.cardPacks.get(card.pack).questions.push(card);
+    }
+
+    console.log("Cards loaded");
   }
 
+  /**
+   * Returns all answer and question cards of the given packs
+   * in an object with two fields: answers and questions.
+   *
+   * @param packs
+   */
   getCards(packs: string[]) {
-    const cards = packs.map((name) => this.cardPacks.get(name));
+    const answers = packs
+      .map((pack) => this.cardPacks.get(pack).answers)
+      .flat(1);
+
+    const questions = packs
+      .map((pack) => this.cardPacks.get(pack).questions)
+      .flat(1);
 
     return {
-      answers: cards.map((pack) => pack.answers).flat(1),
-      questions: cards.map((pack) => pack.questions).flat(1),
+      answers,
+      questions,
     };
   }
 }
 
 export const DB = new Database(DEFAULT_CONFIG);
+
+const createCardPack = (name: string): CardPack => ({
+  name,
+  answers: [] as AnswerCard[],
+  questions: [] as QuestionCard[],
+});

@@ -13,14 +13,15 @@ export const Cahum: Game = {
   // setupData is an optional custom object that is
   // passed through the Game Creation API.
   setup: (ctx, setupData) => {
-    return {
-      table: [], // holds all submitted cards
+    const cards = DB.getCards(["Cahum"]);
 
-      hands: {}, // hands of all players
+    return {
+      table: {}, // all submitted cards with playerNum as key
+      hands: {}, // hands of all players with playerNum as key
 
       // not sent to clients
       serverOnly: {
-        cards: DB.getCards(["Cahum"]),
+        cards,
       },
     };
   },
