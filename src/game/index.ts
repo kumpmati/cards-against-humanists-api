@@ -1,4 +1,5 @@
 import { Game } from "boardgame.io";
+import { DB } from "../db";
 import play from "./phases/play";
 import waitForPlayers from "./phases/waitForPlayers";
 
@@ -13,10 +14,14 @@ export const Cahum: Game = {
   // passed through the Game Creation API.
   setup: (ctx, setupData) => {
     return {
-      deck: [], // holds all the cards available in the game
       table: [], // holds all submitted cards
 
-      players: {},
+      hands: {}, // hands of all players
+
+      // not sent to clients
+      serverOnly: {
+        cards: DB.getCards(["Cahum"]),
+      },
     };
   },
 
@@ -31,8 +36,11 @@ export const Cahum: Game = {
       return "Number of players must be 2 <= x <= 100";
   },
 
-  // Function that allows you to tailor the game state to a specific player.
-  playerView: (G, ctx, playerID) => {},
+  playerView: (G, ctx, playerID) => {
+    const { serverOnly, ...toClient } = G; // remove server-only data from G
+
+    return toClient;
+  },
 
   // The seed used by the pseudo-random number generator.
   seed: "teekkarilakki",

@@ -1,13 +1,29 @@
-import { CardPack } from "../types";
+import * as admin from "firebase-admin";
+import { DEFAULT_CONFIG } from "../config";
+import { Config } from "../config/config";
+import { Card, CardPack } from "../game/types";
+import { dbHelpers } from "../helpers/db";
 
 /**
  * Database class, responsible for providing cards to games
  */
 class Database {
-  private cards: Map<string, CardPack>;
+  private app: admin.app.App;
+  private _firestore: FirebaseFirestore.Firestore;
+  private db;
 
-  constructor() {
-    console.log("Database initialized");
+  private cardPacks: Map<string, CardPack>;
+
+  constructor(config: Config) {
+    this.cardPacks = new Map();
+
+    this.app = admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+      databaseURL: config.db,
+    });
+
+    this._firestore = this.app.firestore();
+    this.db = dbHelpers(this._firestore);
   }
 
   /**
@@ -15,16 +31,21 @@ class Database {
    */
   async load() {
     console.log("Loading cards...");
-    // TODO: fetch cards from DB
+
+    const packs = (await this.db.packs.get()).docs.map((d) => d.data());
+    packs.forEach((pack) => {
+      this.cardPacks.set(pack.name, pack);
+    });
   }
 
-  /**
-   * Returns all cards in the given packs as a flattened array
-   * @param packs
-   */
   getCards(packs: string[]) {
-    return packs.map(this.cards.get);
+    const cards = packs.map((name) => this.cardPacks.get(name));
+
+    return {
+      answers: cards.map((pack) => pack.answers).flat(1),
+      questions: cards.map((pack) => pack.questions).flat(1),
+    };
   }
 }
 
-export const DB = new Database();
+export const DB = new Database(DEFAULT_CONFIG);
