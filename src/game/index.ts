@@ -2,7 +2,9 @@ import { Game } from "boardgame.io";
 import { DB } from "../db";
 import play from "./phases/play";
 import waitForPlayers from "./phases/waitForPlayers";
-import { CahumG } from "./types";
+import { CahumG, SetupData } from "./types";
+
+export const CARDS_IN_HAND = 7;
 
 /**
  * SERVER SIDE
@@ -14,16 +16,10 @@ export const Cahum: Game<CahumG> = {
   // setupData is an optional custom object that is
   // passed through the Game Creation API.
   setup: (ctx, setupData: SetupData): CahumG => {
-    const cards = DB.getCards(setupData.packs);
-
     return {
       table: {}, // all submitted cards with playerNum as key
       hands: {}, // hands of all players with playerNum as key
-
-      // not sent to clients
-      serverOnly: {
-        cards,
-      },
+      packs: setupData.packs,
     };
   },
 
@@ -44,11 +40,7 @@ export const Cahum: Game<CahumG> = {
     }
   },
 
-  playerView: (G, ctx, playerID) => {
-    const { serverOnly, ...toClient } = G; // remove server-only data from G
-
-    return toClient;
-  },
+  // playerView: (G, ctx, playerID) => {},
 
   // The seed used by the pseudo-random number generator.
   seed: "teekkarilakki",
@@ -72,12 +64,3 @@ const isSetupData = (data: any): data is SetupData =>
   typeof data.shuffleAnswers === "boolean" &&
   data.hasOwnProperty("czarReveals") &&
   typeof data.czarReveals === "boolean";
-
-// TODO: more complicated setup data
-interface SetupData {
-  packs: string[];
-  password?: string;
-  maxPlayers: number;
-  shuffleAnswers: boolean;
-  czarReveals: boolean;
-}

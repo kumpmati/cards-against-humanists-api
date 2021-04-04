@@ -18,13 +18,15 @@ export interface CardPack {
 }
 
 export type CahumG = {
-  table: {};
-  hands: {};
-
-  serverOnly: {
-    cards: {
-      answers: AnswerCard[];
-      questions: QuestionCard[];
-    };
-  };
+  table: Record<string, any>;
+  hands: Record<string, any>;
+  packs: string[];
 };
+
+export interface SetupData {
+  packs: string[];
+  password?: string;
+  maxPlayers: number;
+  shuffleAnswers: boolean;
+  czarReveals: boolean;
+}

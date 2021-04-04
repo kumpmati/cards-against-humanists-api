@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import { DEFAULT_CONFIG } from "../config";
 import { Config } from "../config/config";
 import { AnswerCard, CardPack, QuestionCard } from "../game/types";
+import { shuffle } from "../helpers";
 import { dbHelpers } from "../helpers/db";
 
 /**
@@ -76,6 +77,28 @@ class Database {
       answers,
       questions,
     };
+  }
+
+  /**
+   * Returns an array of length n containing random answer cards from the given packs
+   * @param num
+   * @param packs
+   */
+  getAnswerCards(n: number, packs: string[]) {
+    const cards = packs.map((pack) => this.cardPacks.get(pack).answers).flat(1);
+    return shuffle(cards).slice(0, n);
+  }
+
+  /**
+   * Returns an array of length n containing random answer cards from the given packs
+   * @param num
+   * @param packs
+   */
+  getQuestionCards(n: number, packs: string[]) {
+    const cards = packs
+      .map((pack) => this.cardPacks.get(pack).questions)
+      .flat(1);
+    return shuffle(cards).slice(0, n);
   }
 }
 
