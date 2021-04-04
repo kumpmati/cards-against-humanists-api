@@ -14,7 +14,7 @@ import { AnswerCard, CahumG } from "../../types";
 export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
   if (!Array.isArray(cards)) return INVALID_MOVE;
 
-  ctx.events.setStage(PlayStages.waitForCzar);
+  ctx.events.setStage(PlayStages.waitForOthers); // wait for other players
 };
 
 /**
