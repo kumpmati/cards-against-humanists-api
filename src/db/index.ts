@@ -68,8 +68,8 @@ class Database {
       if (!this.cardPacks.has(name)) throw new Error("Card pack not found");
       const pack = this.cardPacks.get(name);
 
-      answers.concat(pack.answers);
-      questions.concat(pack.questions);
+      answers.push(...pack.answers);
+      questions.push(...pack.questions);
     }
 
     return {
