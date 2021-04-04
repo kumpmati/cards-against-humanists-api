@@ -17,7 +17,10 @@ export const Cahum: Game<CahumG> = {
   // passed through the Game Creation API.
   setup: (ctx, setupData: SetupData): CahumG => {
     return {
-      table: {}, // all submitted cards with playerNum as key
+      table: {
+        question: null,
+        answers: [],
+      }, // all submitted cards with playerNum as key
       hands: {}, // hands of all players with playerNum as key
       packs: setupData.packs,
     };
@@ -40,7 +43,16 @@ export const Cahum: Game<CahumG> = {
     }
   },
 
-  // playerView: (G, ctx, playerID) => {},
+  /**
+   *
+   * @param G
+   * @param ctx
+   * @param playerID
+   */
+  playerView: (G, ctx, playerID) => {
+    const { table, hands } = G;
+    return { table, hand: hands[playerID] };
+  },
 
   // The seed used by the pseudo-random number generator.
   seed: "teekkarilakki",

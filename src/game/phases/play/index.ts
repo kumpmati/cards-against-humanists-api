@@ -24,7 +24,11 @@ const onRoundBegin = (G: CahumG, ctx: Ctx) => {
     moveLimit: 1,
   });
 
-  G.table = {}; // reset table
+  // reset table state
+  G.table = {
+    question: DB.getQuestionCards(1, G.packs)[0],
+    answers: [],
+  };
 
   // give all players their cards
   // TODO: adjustable amount of cards

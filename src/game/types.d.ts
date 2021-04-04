@@ -18,8 +18,11 @@ export interface CardPack {
 }
 
 export type CahumG = {
-  table: Record<string, any>;
-  hands: Record<string, any>;
+  table: {
+    question: QuestionCard;
+    answers: AnswerCard[][];
+  };
+  hands: Record<string, any[]>;
   packs: string[];
 };
 
