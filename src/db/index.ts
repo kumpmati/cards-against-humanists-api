@@ -61,13 +61,16 @@ class Database {
    * @param packs
    */
   getCards(packs: string[]) {
-    const answers = packs
-      .map((pack) => this.cardPacks.get(pack).answers)
-      .flat(1);
+    const answers = [] as AnswerCard[];
+    const questions = [] as QuestionCard[];
 
-    const questions = packs
-      .map((pack) => this.cardPacks.get(pack).questions)
-      .flat(1);
+    for (const name of packs) {
+      if (!this.cardPacks.has(name)) throw new Error("Card pack not found");
+      const pack = this.cardPacks.get(name);
+
+      answers.concat(pack.answers);
+      questions.concat(pack.questions);
+    }
 
     return {
       answers,

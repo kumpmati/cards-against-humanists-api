@@ -12,8 +12,8 @@ export const Cahum: Game = {
   // Function that returns the initial value of G.
   // setupData is an optional custom object that is
   // passed through the Game Creation API.
-  setup: (ctx, setupData) => {
-    const cards = DB.getCards(["Cahum"]);
+  setup: (ctx, setupData: SetupData) => {
+    const cards = DB.getCards(setupData.packs);
 
     return {
       table: {}, // all submitted cards with playerNum as key
@@ -54,7 +54,23 @@ export const Cahum: Game = {
   disableUndo: true,
 };
 
-const isSetupData = (data: any): data is SetupData => typeof data === "object";
+// type guard for SetupData
+const isSetupData = (data: any): data is SetupData =>
+  typeof data === "object" &&
+  data.hasOwnProperty("packs") &&
+  Array.isArray(data.packs) &&
+  data.hasOwnProperty("maxPlayers") &&
+  typeof data.maxPlayers === "number" &&
+  data.hasOwnProperty("shuffleAnswers") &&
+  typeof data.shuffleAnswers === "boolean" &&
+  data.hasOwnProperty("czarReveals") &&
+  typeof data.czarReveals === "boolean";
 
 // TODO: more complicated setup data
-interface SetupData {}
+interface SetupData {
+  packs: string[];
+  password?: string;
+  maxPlayers: number;
+  shuffleAnswers: boolean;
+  czarReveals: boolean;
+}
