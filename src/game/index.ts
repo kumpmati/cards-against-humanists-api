@@ -35,6 +35,12 @@ export const Cahum: Game = {
 
     if (numPlayers < 2 || numPlayers > 100)
       return "Number of players must be 2 <= x <= 100";
+
+    try {
+      DB.getCards(setupData.packs); // check that all card packs are valid
+    } catch (e) {
+      return e.message;
+    }
   },
 
   playerView: (G, ctx, playerID) => {
