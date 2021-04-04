@@ -15,6 +15,14 @@ export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
   if (!Array.isArray(cards)) return INVALID_MOVE;
 
   G.table.answers.push(cards);
+
+  // filters out all cards that have been submitted
+  const newHand = G.hands[ctx.playerID]?.filter(
+    (c: AnswerCard) => !cards.find((card) => card.text === c.text)
+  ) as AnswerCard[];
+
+  G.hands[ctx.playerID] = newHand;
+
   ctx.events.setStage(PlayStages.waitForOthers); // wait for other players
 };
 
