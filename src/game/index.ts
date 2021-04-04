@@ -2,17 +2,18 @@ import { Game } from "boardgame.io";
 import { DB } from "../db";
 import play from "./phases/play";
 import waitForPlayers from "./phases/waitForPlayers";
+import { CahumG } from "./types";
 
 /**
- * Cards Against Humanists
+ * SERVER SIDE
  */
-export const Cahum: Game = {
+export const Cahum: Game<CahumG> = {
   name: "cahum",
 
   // Function that returns the initial value of G.
   // setupData is an optional custom object that is
   // passed through the Game Creation API.
-  setup: (ctx, setupData: SetupData) => {
+  setup: (ctx, setupData: SetupData): CahumG => {
     const cards = DB.getCards(setupData.packs);
 
     return {

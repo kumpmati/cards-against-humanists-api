@@ -16,3 +16,15 @@ export interface CardPack {
   questions: QuestionCard[];
   answers: AnswerCard[];
 }
+
+export type CahumG = {
+  table: {};
+  hands: {};
+
+  serverOnly: {
+    cards: {
+      answers: AnswerCard[];
+      questions: QuestionCard[];
+    };
+  };
+};
