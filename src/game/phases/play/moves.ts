@@ -44,7 +44,7 @@ export const revealCard = (G: CahumG, ctx: Ctx, id: string) => {
  * @param ctx
  * @param id
  */
-export const submitWinner = (G: CahumG, ctx: Ctx, id: string) => {
+export const chooseWinner = (G: CahumG, ctx: Ctx, id: string) => {
   if (typeof id !== "string") return INVALID_MOVE;
 
   // TODO: error handling and giving a point to the player

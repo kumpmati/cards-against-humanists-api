@@ -2,7 +2,7 @@ import { Ctx, PhaseConfig } from "boardgame.io";
 import { NUM_CARDS } from "../..";
 import { DB } from "../../../db";
 import { CahumG } from "../../types";
-import { submitAnswer, submitWinner } from "./moves";
+import { submitAnswer, chooseWinner } from "./moves";
 
 export enum PlayStages {
   submitAnswer = "submitAnswer",
@@ -90,7 +90,7 @@ const play: PhaseConfig<CahumG> = {
       // Czar chooses who wins the round
       [PlayStages.chooseWinner]: {
         moves: {
-          submitWinner,
+          chooseWinner,
         },
       },
 
