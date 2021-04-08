@@ -1,12 +1,14 @@
 export type Card = QuestionCard | AnswerCard;
 
 export interface QuestionCard {
+  id?: string;
   text: string;
   required_cards: number;
   pack: string;
 }
 
 export interface AnswerCard {
+  id?: string;
   text: string;
   pack: string;
 }
@@ -21,9 +23,10 @@ export type CahumG = {
   table: {
     question: QuestionCard;
     answers: AnswerCard[][];
+    revealed: string[];
   };
-  hands: Record<string, any[]>;
-  packs: string[];
+  hands: Record<string, AnswerCard[]>;
+  settings: SetupData;
 };
 
 export interface SetupData {

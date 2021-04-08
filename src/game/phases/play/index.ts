@@ -1,14 +1,15 @@
 import { Ctx, PhaseConfig } from "boardgame.io";
-import { CARDS_IN_HAND } from "../..";
+import { NUM_CARDS } from "../..";
 import { DB } from "../../../db";
 import { CahumG } from "../../types";
-import { chooseWinner, submitAnswer } from "./moves";
+import { submitAnswer, submitWinner } from "./moves";
 
 export enum PlayStages {
-  chooseCard = "chooseCard",
-  pickWinner = "pickWinner",
-  waitForOthers = "waitForOthers",
+  submitAnswer = "submitAnswer",
+  waitForAnswers = "waitForAnswers",
+
   waitForCzar = "waitForCzar",
+  chooseWinner = "chooseWinner",
 }
 
 /**
@@ -16,18 +17,18 @@ export enum PlayStages {
  * @param G
  * @param ctx
  */
-const onRoundBegin = (G: CahumG, ctx: Ctx) => {
-  // move players to stages
+const onBegin = (G: CahumG, ctx: Ctx) => {
+  // mark every player as an active player so that the turn doesn't end automatically
   ctx.events.setActivePlayers({
-    currentPlayer: PlayStages.waitForOthers,
-    others: PlayStages.chooseCard,
-    moveLimit: 1,
+    currentPlayer: PlayStages.waitForAnswers, // czar waits for answers from players
+    others: { stage: PlayStages.submitAnswer, moveLimit: 1 }, // players submit answers
   });
 
   // reset table state
   G.table = {
-    question: DB.getQuestionCards(1, G.packs)[0],
+    question: DB.getQuestionCards(1, G.settings.packs)[0], // random question from DB
     answers: [],
+    revealed: [],
   };
 
   // give all players their cards
@@ -35,11 +36,39 @@ const onRoundBegin = (G: CahumG, ctx: Ctx) => {
   for (let i = 0; i < ctx.numPlayers; i++) {
     if (!G.hands[i]) G.hands[i] = [];
 
-    const numCardsMissing = CARDS_IN_HAND - G.hands[i].length;
-    const newCards = DB.getAnswerCards(numCardsMissing, G.packs);
+    const numCardsMissing = NUM_CARDS - G.hands[i].length;
+    const newCards = DB.getAnswerCards(numCardsMissing, G.settings.packs);
 
     G.hands[i].push(...newCards);
   }
+};
+
+/**
+ * Helper function to calculate number of active players that are currently in the given stage
+ * @param ctx Ctx
+ * @param stage Stage name
+ * @returns Number of players in that stage
+ */
+const numPlayersAtStage = (ctx: Ctx, stage: string): number =>
+  Object.values(ctx?.activePlayers || {}).filter((p) => p === stage).length;
+
+/**
+ * Called after every move. Handles checking if all players have answered.
+ * @param G
+ * @param ctx
+ */
+const onMove = (G: CahumG, ctx: Ctx) => {
+  const waitingForAnswers = numPlayersAtStage(ctx, PlayStages.submitAnswer) > 0;
+  if (waitingForAnswers) return; // waiting for players, do nothing
+
+  const inChoosingStage = numPlayersAtStage(ctx, PlayStages.chooseWinner) > 0;
+  if (inChoosingStage) return; // already choosing, do nothing
+
+  // set czar to chooseWinner stage
+  ctx.events.setActivePlayers({
+    currentPlayer: PlayStages.chooseWinner,
+    others: PlayStages.waitForCzar,
+  });
 };
 
 /**
@@ -47,28 +76,30 @@ const onRoundBegin = (G: CahumG, ctx: Ctx) => {
  */
 const play: PhaseConfig<CahumG> = {
   turn: {
-    onBegin: onRoundBegin,
+    onBegin,
+    onMove,
+
     stages: {
-      // players other than the Czar submit their answers
-      [PlayStages.chooseCard]: {
+      // players (not Czar) submit their answers
+      [PlayStages.submitAnswer]: {
         moves: {
           submitAnswer,
         },
       },
 
-      // Czar waits for the other players to choose their cards
-      [PlayStages.waitForOthers]: {
-        moves: {},
-      },
-
-      // Czar picks the winner
-      [PlayStages.pickWinner]: {
+      // Czar chooses who wins the round
+      [PlayStages.chooseWinner]: {
         moves: {
-          chooseWinner,
+          submitWinner,
         },
       },
 
-      // players wait for the Czar to pick the winner
+      // cannot do anything while waiting
+      [PlayStages.waitForAnswers]: {
+        moves: {},
+      },
+
+      // cannot do anything while waiting
       [PlayStages.waitForCzar]: {
         moves: {},
       },

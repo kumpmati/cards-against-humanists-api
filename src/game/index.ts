@@ -4,7 +4,7 @@ import play from "./phases/play";
 import waitForPlayers from "./phases/waitForPlayers";
 import { CahumG, SetupData } from "./types";
 
-export const CARDS_IN_HAND = 7;
+export const NUM_CARDS = 7;
 
 /**
  * SERVER SIDE
@@ -20,9 +20,10 @@ export const Cahum: Game<CahumG> = {
       table: {
         question: null,
         answers: [],
+        revealed: [],
       }, // all submitted cards with playerNum as key
       hands: {}, // hands of all players with playerNum as key
-      packs: setupData.packs,
+      settings: setupData,
     };
   },
 
@@ -44,13 +45,16 @@ export const Cahum: Game<CahumG> = {
   },
 
   /**
-   *
+   * Strips away unnecessary info
    * @param G
    * @param ctx
    * @param playerID
    */
   playerView: (G, ctx, playerID) => {
     const { table, hands } = G;
+
+    const stage = ctx.activePlayers?.[playerID];
+
     return { table, hand: hands[playerID] };
   },
 

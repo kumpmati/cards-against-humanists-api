@@ -1,7 +1,5 @@
 import { Ctx } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
-import { PlayStages } from ".";
-
 import { AnswerCard, CahumG } from "../../types";
 
 /**
@@ -14,26 +12,42 @@ import { AnswerCard, CahumG } from "../../types";
 export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
   if (!Array.isArray(cards)) return INVALID_MOVE;
 
-  G.table.answers.push(cards);
+  const cardsWithPlayerID = cards.map((card) => ({
+    ...card,
+    id: ctx.playerID,
+  }));
+  G.table.answers.push(cardsWithPlayerID);
 
-  // filters out all cards that have been submitted
+  // filter out all cards that have been submitted
   const newHand = G.hands[ctx.playerID]?.filter(
     (c: AnswerCard) => !cards.find((card) => card.text === c.text)
-  ) as AnswerCard[];
+  );
 
-  G.hands[ctx.playerID] = newHand;
-
-  ctx.events.setStage(PlayStages.waitForOthers); // wait for other players
+  G.hands[ctx.playerID] = newHand; // update player's hand
 };
 
 /**
- * Used to pick a winner among submitted cards.
- * The winner will get 1 point.
- * Can be called once per round.
+ * Reveals an answer card.
+ * Only the current Czar can make this move.
  * @param G
  * @param ctx
- * @param args
+ * @param id
  */
-export const chooseWinner = (G: CahumG, ctx: Ctx, ...args: any[]) => {
-  console.log(G, ctx, "|", args);
+export const revealCard = (G: CahumG, ctx: Ctx, id: string) => {
+  console.log("revealCard:", id);
+};
+
+/**
+ * Chooses the winning player for the round.
+ * Only the current Czar can make this move.
+ * @param G
+ * @param ctx
+ * @param id
+ */
+export const submitWinner = (G: CahumG, ctx: Ctx, id: string) => {
+  if (typeof id !== "string") return INVALID_MOVE;
+
+  // TODO: error handling and giving a point to the player
+
+  ctx.events.endTurn(); // move to next round
 };
