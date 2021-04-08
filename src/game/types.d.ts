@@ -1,3 +1,5 @@
+import { PlayStages } from "./phases/play";
+
 export type Card = QuestionCard | AnswerCard;
 
 export interface QuestionCard {
@@ -20,10 +22,11 @@ export interface CardPack {
 }
 
 export type CahumG = {
+  currentStage: PlayStages;
   table: {
     question: QuestionCard;
-    answers: AnswerCard[][];
-    revealed: string[];
+    answers: AnswerCard[];
+    revealed: AnswerCard[];
   };
   hands: Record<string, AnswerCard[]>;
   settings: SetupData;

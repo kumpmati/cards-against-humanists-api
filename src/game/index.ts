@@ -1,6 +1,7 @@
 import { Game } from "boardgame.io";
-import { DB } from "../db";
 import play from "./phases/play";
+import { playPlayerView } from "./phases/play/playerView";
+import { validateSetupData } from "./setup";
 import waitForPlayers from "./phases/waitForPlayers";
 import { CahumG, SetupData } from "./types";
 
@@ -17,6 +18,7 @@ export const Cahum: Game<CahumG> = {
   // passed through the Game Creation API.
   setup: (ctx, setupData: SetupData): CahumG => {
     return {
+      currentStage: null,
       table: {
         question: null,
         answers: [],
@@ -27,36 +29,8 @@ export const Cahum: Game<CahumG> = {
     };
   },
 
-  // Optional function to validate the setupData before
-  // matches are created. If this returns a value,
-  // an error will be reported to the user and match
-  // creation is aborted.
-  validateSetupData: (setupData, numPlayers) => {
-    if (!isSetupData(setupData)) return "Setup data is malformed";
-
-    if (numPlayers < 2 || numPlayers > 100)
-      return "Number of players must be 2 <= x <= 100";
-
-    try {
-      DB.getCards(setupData.packs); // check that all card packs are valid
-    } catch (e) {
-      return e.message;
-    }
-  },
-
-  /**
-   * Strips away unnecessary info
-   * @param G
-   * @param ctx
-   * @param playerID
-   */
-  playerView: (G, ctx, playerID) => {
-    const { table, hands } = G;
-
-    const stage = ctx.activePlayers?.[playerID];
-
-    return { table, hand: hands[playerID] };
-  },
+  validateSetupData,
+  playerView: playPlayerView,
 
   // The seed used by the pseudo-random number generator.
   seed: "teekkarilakki",
@@ -68,15 +42,3 @@ export const Cahum: Game<CahumG> = {
 
   disableUndo: true,
 };
-
-// type guard for SetupData
-const isSetupData = (data: any): data is SetupData =>
-  typeof data === "object" &&
-  data.hasOwnProperty("packs") &&
-  Array.isArray(data.packs) &&
-  data.hasOwnProperty("maxPlayers") &&
-  typeof data.maxPlayers === "number" &&
-  data.hasOwnProperty("shuffleAnswers") &&
-  typeof data.shuffleAnswers === "boolean" &&
-  data.hasOwnProperty("czarReveals") &&
-  typeof data.czarReveals === "boolean";

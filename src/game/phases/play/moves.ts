@@ -12,11 +12,9 @@ import { AnswerCard, CahumG } from "../../types";
 export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
   if (!Array.isArray(cards)) return INVALID_MOVE;
 
-  const cardsWithPlayerID = cards.map((card) => ({
-    ...card,
-    id: ctx.playerID,
-  }));
-  G.table.answers.push(cardsWithPlayerID);
+  cards.forEach((card, i) => {
+    G.table.answers.push({ ...card, id: `${ctx.playerID}-${i}` });
+  });
 
   // filter out all cards that have been submitted
   const newHand = G.hands[ctx.playerID]?.filter(
@@ -35,6 +33,13 @@ export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
  */
 export const revealCard = (G: CahumG, ctx: Ctx, id: string) => {
   console.log("revealCard:", id);
+  const card = G.table.answers.find((c) => c.id === id);
+  if (!card) return INVALID_MOVE;
+
+  const alreadyRevealed = G.table.revealed.find((c) => c.id === id);
+  if (alreadyRevealed) return INVALID_MOVE;
+
+  G.table.revealed.push(card);
 };
 
 /**

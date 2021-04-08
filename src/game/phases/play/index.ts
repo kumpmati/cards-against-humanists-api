@@ -2,11 +2,13 @@ import { Ctx, PhaseConfig } from "boardgame.io";
 import { NUM_CARDS } from "../..";
 import { DB } from "../../../db";
 import { CahumG } from "../../types";
-import { submitAnswer, chooseWinner } from "./moves";
+import { submitAnswer, chooseWinner, revealCard } from "./moves";
 
 export enum PlayStages {
   submitAnswer = "submitAnswer",
   waitForAnswers = "waitForAnswers",
+
+  czarReveals = "czarReveals",
 
   waitForCzar = "waitForCzar",
   chooseWinner = "chooseWinner",
@@ -23,6 +25,8 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
     currentPlayer: PlayStages.waitForAnswers, // czar waits for answers from players
     others: { stage: PlayStages.submitAnswer, moveLimit: 1 }, // players submit answers
   });
+
+  G.currentStage = PlayStages.submitAnswer;
 
   // reset table state
   G.table = {
@@ -64,7 +68,21 @@ const onMove = (G: CahumG, ctx: Ctx) => {
   const inChoosingStage = numPlayersAtStage(ctx, PlayStages.chooseWinner) > 0;
   if (inChoosingStage) return; // already choosing, do nothing
 
-  // set czar to chooseWinner stage
+  const allCardsRevealed =
+    G.table.answers.length > 0 &&
+    G.table.answers.length === G.table.revealed.length;
+
+  if (G.settings.czarReveals && !allCardsRevealed) {
+    // all cards must be revealed before choosing a winner
+    G.currentStage = PlayStages.czarReveals;
+    ctx.events.setActivePlayers({
+      currentPlayer: PlayStages.czarReveals,
+      others: PlayStages.waitForCzar,
+    });
+    return;
+  }
+
+  G.currentStage = PlayStages.chooseWinner;
   ctx.events.setActivePlayers({
     currentPlayer: PlayStages.chooseWinner,
     others: PlayStages.waitForCzar,
@@ -84,6 +102,13 @@ const play: PhaseConfig<CahumG> = {
       [PlayStages.submitAnswer]: {
         moves: {
           submitAnswer,
+        },
+      },
+
+      // Czar reveals answers one by one
+      [PlayStages.czarReveals]: {
+        moves: {
+          revealCard,
         },
       },
 
