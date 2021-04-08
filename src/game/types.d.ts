@@ -11,6 +11,7 @@ export interface QuestionCard {
 
 export interface AnswerCard {
   id?: string;
+  owner?: string;
   text: string;
   pack: string;
 }
