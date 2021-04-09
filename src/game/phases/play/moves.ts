@@ -61,5 +61,6 @@ export const chooseWinner = (G: CahumG, ctx: Ctx, id: string) => {
   if (!G.points[winningPlayerID]) G.points[winningPlayerID] = 0;
   G.points[winningPlayerID] += 1;
 
-  ctx.events.endTurn(); // move to next round
+  // move to next round and set the winner as the next czar
+  ctx.events.endTurn({ next: winningPlayerID });
 };
