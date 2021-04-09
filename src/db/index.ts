@@ -19,7 +19,7 @@ class Database {
     this.cardPacks = new Map();
 
     this.app = admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
+      credential: admin.credential.cert(config.firebase),
       databaseURL: config.db,
     });
 
