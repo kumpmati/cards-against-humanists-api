@@ -36,7 +36,6 @@ export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
  * @param id
  */
 export const revealCard = (G: CahumG, ctx: Ctx, id: string) => {
-  console.log("revealCard:", id);
   const card = G.table.answers.find((c) => c.id === id);
   if (!card) return INVALID_MOVE;
 
