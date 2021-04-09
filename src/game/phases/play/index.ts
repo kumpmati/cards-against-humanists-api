@@ -26,6 +26,7 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
     others: { stage: PlayStages.submitAnswer, moveLimit: 1 }, // players submit answers
   });
 
+  G.state.round++;
   G.state.stage = PlayStages.submitAnswer;
 
   // reset table state

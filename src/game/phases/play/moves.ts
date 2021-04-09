@@ -59,5 +59,8 @@ export const chooseWinner = (G: CahumG, ctx: Ctx, id: string) => {
   const winningPlayerID = G.table.answers.find((card) => card.id === id)?.owner;
   if (!winningPlayerID) return INVALID_MOVE;
 
+  if (!G.points[winningPlayerID]) G.points[winningPlayerID] = 0;
+  G.points[winningPlayerID] += 1;
+
   ctx.events.endTurn(); // move to next round
 };
