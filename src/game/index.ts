@@ -18,13 +18,17 @@ export const Cahum: Game<CahumG> = {
   // passed through the Game Creation API.
   setup: (ctx, setupData: SetupData): CahumG => {
     return {
-      currentStage: null,
       table: {
         question: null,
         answers: [],
         revealed: [],
       }, // all submitted cards with playerNum as key
-      hands: {}, // hands of all players with playerNum as key
+      state: {
+        round: 0,
+        stage: null,
+      },
+      points: {},
+      hands: {},
       settings: setupData,
     };
   },

@@ -1,6 +1,6 @@
 import { Ctx } from "boardgame.io";
 import { PlayStages } from ".";
-import { AnswerCard, CahumG, Card } from "../../types";
+import { AnswerCard, CahumG, CahumGClient, Card } from "../../types";
 
 /**
  * Strips away any info that shouldn't be sent to players.
@@ -8,19 +8,23 @@ import { AnswerCard, CahumG, Card } from "../../types";
  * @param ctx
  * @param playerID
  */
-export const playPlayerView = (G: CahumG, ctx: Ctx, playerID: string) => {
-  const { table: originalTable, hands } = G;
+export const playPlayerView = (
+  G: CahumG,
+  ctx: Ctx,
+  playerID: string
+): CahumGClient => {
+  const { table: originalTable, hands, points, state, settings } = G;
 
   let formattedAnswers: AnswerCard[] = originalTable.answers.slice(0);
 
-  if (G.currentStage === PlayStages.submitAnswer) {
+  if (state.stage === PlayStages.submitAnswer) {
     // don't show text on cards until all answers have been submitted
     formattedAnswers = formattedAnswers.map(hideCardText);
   }
 
   if (
-    G.currentStage === PlayStages.chooseWinner ||
-    G.currentStage === PlayStages.czarReveals
+    state.stage === PlayStages.chooseWinner ||
+    state.stage === PlayStages.czarReveals
   ) {
     if (G.settings.czarReveals) {
       formattedAnswers = formattedAnswers.map((card) =>
@@ -29,9 +33,12 @@ export const playPlayerView = (G: CahumG, ctx: Ctx, playerID: string) => {
     }
   }
 
-  const strippedG = {
+  const strippedG: CahumGClient = {
     table: { ...originalTable, answers: formattedAnswers },
     hand: hands[playerID],
+    state,
+    settings,
+    points,
   };
 
   return strippedG;

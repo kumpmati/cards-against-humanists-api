@@ -26,7 +26,7 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
     others: { stage: PlayStages.submitAnswer, moveLimit: 1 }, // players submit answers
   });
 
-  G.currentStage = PlayStages.submitAnswer;
+  G.state.stage = PlayStages.submitAnswer;
 
   // reset table state
   G.table = {
@@ -74,7 +74,8 @@ const onMove = (G: CahumG, ctx: Ctx) => {
 
   if (G.settings.czarReveals && !allCardsRevealed) {
     // all cards must be revealed before choosing a winner
-    G.currentStage = PlayStages.czarReveals;
+    G.state.stage = PlayStages.czarReveals;
+
     ctx.events.setActivePlayers({
       currentPlayer: PlayStages.czarReveals,
       others: PlayStages.waitForCzar,
@@ -82,7 +83,8 @@ const onMove = (G: CahumG, ctx: Ctx) => {
     return;
   }
 
-  G.currentStage = PlayStages.chooseWinner;
+  G.state.stage = PlayStages.chooseWinner;
+
   ctx.events.setActivePlayers({
     currentPlayer: PlayStages.chooseWinner,
     others: PlayStages.waitForCzar,
@@ -100,23 +102,17 @@ const play: PhaseConfig<CahumG> = {
     stages: {
       // players (not Czar) submit their answers
       [PlayStages.submitAnswer]: {
-        moves: {
-          submitAnswer,
-        },
+        moves: { submitAnswer },
       },
 
       // Czar reveals answers one by one
       [PlayStages.czarReveals]: {
-        moves: {
-          revealCard,
-        },
+        moves: { revealCard },
       },
 
       // Czar chooses who wins the round
       [PlayStages.chooseWinner]: {
-        moves: {
-          chooseWinner,
-        },
+        moves: { chooseWinner },
       },
 
       // cannot do anything while waiting

@@ -23,15 +23,23 @@ export interface CardPack {
 }
 
 export type CahumG = {
-  currentStage: PlayStages;
   table: {
     question: QuestionCard;
     answers: AnswerCard[];
     revealed: AnswerCard[];
   };
+  points: Record<string, number>;
   hands: Record<string, AnswerCard[]>;
+  state: {
+    round: number;
+    stage: PlayStages;
+  };
   settings: SetupData;
 };
+
+export interface CahumGClient extends Omit<CahumG, "hands"> {
+  hand: AnswerCard[];
+}
 
 export interface SetupData {
   packs: string[];
