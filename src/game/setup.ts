@@ -24,6 +24,8 @@ const isSetupData = (data: any): data is SetupData =>
   Array.isArray(data.packs) &&
   data.hasOwnProperty("numPlayers") &&
   typeof data.numPlayers === "number" &&
+  data.hasOwnProperty("private") &&
+  typeof data.private === "boolean" &&
   data.hasOwnProperty("shuffleAnswers") &&
   typeof data.shuffleAnswers === "boolean" &&
   data.hasOwnProperty("czarReveals") &&
