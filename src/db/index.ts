@@ -56,6 +56,17 @@ class Database {
   }
 
   /**
+   * Checks that all given card packs exist
+   * @param packs
+   */
+  checkCardPacksExist(packs: string[]): boolean {
+    for (const pack of packs) {
+      if (!this.cardPacks.has(pack)) return false;
+    }
+    return true;
+  }
+
+  /**
    * Returns all answer and question cards of the given packs
    * in an object with two fields: answers and questions.
    *

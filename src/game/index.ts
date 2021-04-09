@@ -34,6 +34,7 @@ export const Cahum: Game<CahumG> = {
   },
 
   validateSetupData,
+
   playerView: playPlayerView,
 
   // The seed used by the pseudo-random number generator.

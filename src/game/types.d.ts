@@ -42,9 +42,9 @@ export interface CahumGClient extends Omit<CahumG, "hands"> {
 }
 
 export interface SetupData {
-  packs: string[];
-  password?: string;
-  maxPlayers: number;
-  shuffleAnswers: boolean;
+  numPlayers: number;
+  password: string;
   czarReveals: boolean;
+  shuffleAnswers: boolean;
+  packs: string[];
 }
