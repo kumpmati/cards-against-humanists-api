@@ -69,10 +69,13 @@ const onMove = (G: CahumG, ctx: Ctx) => {
   const inChoosingStage = numPlayersAtStage(ctx, PlayStages.chooseWinner) > 0;
   if (inChoosingStage) return; // already choosing, do nothing
 
-  const allCardsRevealed =
-    G.table.answers.length > 0 &&
-    G.table.answers.length === G.table.revealed.length;
+  const numCardsRevealed = G.table.revealed.length;
+  const numAnswers = G.table.answers.reduce(
+    (sum, curr) => sum + curr.length,
+    0
+  );
 
+  const allCardsRevealed = numAnswers > 0 && numAnswers === numCardsRevealed;
   if (G.settings.czarReveals && !allCardsRevealed) {
     // all cards must be revealed before choosing a winner
     G.state.stage = PlayStages.czarReveals;
