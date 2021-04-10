@@ -3,14 +3,14 @@ import { PlayStages } from "./phases/play";
 export type Card = QuestionCard | AnswerCard;
 
 export interface QuestionCard {
-  id?: string;
+  id: string;
   text: string;
   required_cards: number;
   pack: string;
 }
 
 export interface AnswerCard {
-  id?: string;
+  id: string;
   owner?: string;
   text: string;
   pack: string;

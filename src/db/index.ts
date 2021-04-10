@@ -1,10 +1,10 @@
 import * as admin from "firebase-admin";
-import { v4 } from "uuid";
 import { DEFAULT_CONFIG } from "../config";
 import { Config } from "../config/config";
-import { AnswerCard, CardPack, QuestionCard } from "../game/types";
+import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
 import { assignRandomID, shuffle } from "../util";
 import { dbHelpers } from "../util/db";
+import { CardChangeEvent, LoadIntoMemoryOpts, LoadOpts } from "./types";
 
 /**
  * Database class, responsible for providing cards to games
@@ -34,9 +34,64 @@ class Database {
   async load() {
     console.log("Loading cards");
 
-    const answers = (await this.db.answers.get()).docs.map((d) => d.data());
-    const questions = (await this.db.questions.get()).docs.map((d) => d.data());
+    const answersPromise = new Promise<void>((resolve) => {
+      this.db.answers.onSnapshot((snapshot) => {
+        snapshot
+          .docChanges()
+          .forEach((change) => this.processCardChange<AnswerCard>(change));
+        resolve();
+      });
+    });
 
+    const questionsPromise = new Promise<void>((resolve) => {
+      this.db.questions.onSnapshot((snapshot) => {
+        snapshot
+          .docChanges()
+          .forEach((change) => this.processCardChange<QuestionCard>(change));
+        resolve();
+      });
+    });
+
+    await Promise.all([answersPromise, questionsPromise]);
+    console.log("Cards loaded");
+  }
+
+  /**
+   * Applies a card change event to the in-memory DB
+   */
+  private processCardChange<T extends Card>(event: CardChangeEvent) {
+    const card = { ...event.doc.data(), id: event.doc.id } as T;
+
+    if (!this.cardPacks.has(card.pack)) {
+      this.cardPacks.set(card.pack, createCardPack(card.pack));
+    }
+
+    const pack = this.cardPacks.get(card.pack);
+    const arr = (cardIsAnswerCard(card) ? pack.answers : pack.questions) as T[];
+
+    switch (event.type) {
+      case "added": {
+        arr.push(card);
+        break;
+      }
+
+      case "modified": {
+        const index = arr.findIndex((c) => c.id === card.id);
+        if (index !== -1) arr[index] = card;
+        break;
+      }
+
+      case "removed": {
+        const index = arr.findIndex((c) => c.id === card.id);
+        if (index !== -1) arr.splice(index, 1);
+      }
+    }
+  }
+
+  /**
+   * Loads cards into memory
+   */
+  private loadIntoMemory({ answers, questions }: LoadIntoMemoryOpts) {
     for (const card of answers) {
       if (!this.cardPacks.has(card.pack)) {
         this.cardPacks.set(card.pack, createCardPack(card.pack));
@@ -52,8 +107,6 @@ class Database {
 
       this.cardPacks.get(card.pack).questions.push(card);
     }
-
-    console.log("Cards loaded");
   }
 
   /**
@@ -104,3 +157,6 @@ const createCardPack = (name: string): CardPack => ({
   answers: [] as AnswerCard[],
   questions: [] as QuestionCard[],
 });
+
+const cardIsAnswerCard = (card: Card): card is AnswerCard =>
+  !card.hasOwnProperty("required_cards");
