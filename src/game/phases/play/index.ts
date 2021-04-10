@@ -1,7 +1,14 @@
 import { Ctx, PhaseConfig } from "boardgame.io";
 import { NUM_CARDS } from "../..";
 import { DB } from "../../../db";
-import { numPlayersAtStage, shuffle } from "../../../util";
+import { shuffle } from "../../../util";
+import {
+  allCardsRevealed,
+  isAtStage,
+  numAnswers,
+  numPlayersAtStage,
+  setStage,
+} from "../../../util/play";
 import { CahumG } from "../../types";
 import { submitAnswer, chooseWinner, revealCard } from "./moves";
 
@@ -28,7 +35,7 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
   });
 
   G.state.round++;
-  G.state.stage = PlayStages.submitAnswer;
+  setStage(G, PlayStages.submitAnswer);
 
   // reset table state
   G.table = {
@@ -42,8 +49,8 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
   for (let i = 0; i < ctx.numPlayers; i++) {
     if (!G.hands[i]) G.hands[i] = [];
 
-    const numCardsMissing = NUM_CARDS - G.hands[i].length;
-    const newCards = DB.getAnswerCards(numCardsMissing, G.settings.packs);
+    const numMissingCards = NUM_CARDS - G.hands[i].length;
+    const newCards = DB.getAnswerCards(numMissingCards, G.settings.packs);
 
     G.hands[i].push(...newCards);
   }
@@ -59,26 +66,16 @@ const onMove = (G: CahumG, ctx: Ctx) => {
   const inChoosingStage = numPlayersAtStage(ctx, PlayStages.chooseWinner) > 0;
   if (waitingForAnswers || inChoosingStage) return; // already choosing, do nothing
 
-  // shuffle only once
-  if (G.state.stage === PlayStages.submitAnswer) {
+  // shuffle answers once
+  if (G.settings.shuffleAnswers && isAtStage(G, PlayStages.submitAnswer)) {
     G.table.answers = shuffle(G.table.answers);
   }
 
   /**
    * Card revealing phase
    */
-
-  const numCardsRevealed = G.table.revealed.length;
-  const numAnswers = G.table.answers.reduce(
-    (sum, curr) => sum + curr.length,
-    0
-  );
-
-  const allCardsRevealed = numAnswers > 0 && numAnswers === numCardsRevealed;
-  if (G.settings.czarReveals && !allCardsRevealed) {
-    // all cards must be revealed before choosing a winner
-    G.state.stage = PlayStages.czarReveals;
-
+  if (G.settings.czarReveals && !allCardsRevealed(G)) {
+    setStage(G, PlayStages.czarReveals);
     ctx.events.setActivePlayers({
       currentPlayer: PlayStages.czarReveals,
       others: PlayStages.waitForCzar,
@@ -89,9 +86,7 @@ const onMove = (G: CahumG, ctx: Ctx) => {
   /**
    * Winner choosing phase
    */
-
-  G.state.stage = PlayStages.chooseWinner;
-
+  setStage(G, PlayStages.chooseWinner);
   ctx.events.setActivePlayers({
     currentPlayer: PlayStages.chooseWinner,
     others: PlayStages.waitForCzar,
@@ -99,7 +94,7 @@ const onMove = (G: CahumG, ctx: Ctx) => {
 };
 
 /**
- * Phase where the actual gameplay happens
+ * Phase where the actual gameplay happens.
  */
 const play: PhaseConfig<CahumG> = {
   turn: {
