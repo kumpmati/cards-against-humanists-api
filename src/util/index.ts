@@ -1,3 +1,4 @@
+import { Ctx } from "boardgame.io";
 import { v4 } from "uuid";
 import { AnswerCard, QuestionCard } from "../game/types";
 
@@ -34,3 +35,12 @@ export const assignRandomID = <T extends AnswerCard | QuestionCard>(
  */
 export const findCard = (card: AnswerCard, arr: AnswerCard[]) =>
   arr.find((c) => c.id === card.id && c.owner === card.owner);
+
+/**
+ * Helper function to calculate number of active players that are currently in the given stage
+ * @param ctx Ctx
+ * @param stage Stage name
+ * @returns Number of players in that stage
+ */
+export const numPlayersAtStage = (ctx: Ctx, stage: string): number =>
+  Object.values(ctx?.activePlayers || {}).filter((p) => p === stage).length;

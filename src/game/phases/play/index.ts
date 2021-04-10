@@ -1,6 +1,7 @@
 import { Ctx, PhaseConfig } from "boardgame.io";
 import { NUM_CARDS } from "../..";
 import { DB } from "../../../db";
+import { numPlayersAtStage, shuffle } from "../../../util";
 import { CahumG } from "../../types";
 import { submitAnswer, chooseWinner, revealCard } from "./moves";
 
@@ -49,25 +50,23 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
 };
 
 /**
- * Helper function to calculate number of active players that are currently in the given stage
- * @param ctx Ctx
- * @param stage Stage name
- * @returns Number of players in that stage
- */
-const numPlayersAtStage = (ctx: Ctx, stage: string): number =>
-  Object.values(ctx?.activePlayers || {}).filter((p) => p === stage).length;
-
-/**
  * Called after every move. Handles checking if all players have answered.
  * @param G
  * @param ctx
  */
 const onMove = (G: CahumG, ctx: Ctx) => {
   const waitingForAnswers = numPlayersAtStage(ctx, PlayStages.submitAnswer) > 0;
-  if (waitingForAnswers) return; // waiting for players, do nothing
-
   const inChoosingStage = numPlayersAtStage(ctx, PlayStages.chooseWinner) > 0;
-  if (inChoosingStage) return; // already choosing, do nothing
+  if (waitingForAnswers || inChoosingStage) return; // already choosing, do nothing
+
+  // shuffle only once
+  if (G.state.stage === PlayStages.submitAnswer) {
+    G.table.answers = shuffle(G.table.answers);
+  }
+
+  /**
+   * Card revealing phase
+   */
 
   const numCardsRevealed = G.table.revealed.length;
   const numAnswers = G.table.answers.reduce(
@@ -86,6 +85,10 @@ const onMove = (G: CahumG, ctx: Ctx) => {
     });
     return;
   }
+
+  /**
+   * Winner choosing phase
+   */
 
   G.state.stage = PlayStages.chooseWinner;
 
