@@ -1,5 +1,6 @@
 import { Ctx } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
+import { findCard } from "../../../util";
 import { AnswerCard, CahumG } from "../../types";
 
 /**
@@ -25,7 +26,7 @@ export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
 
   // remove all submitted cards from hand
   const newHand = G.hands[ctx.playerID]?.filter(
-    (c: AnswerCard) => !cards.find((card) => card.text === c.text)
+    (c: AnswerCard) => !findCard(c, cards)
   );
 
   G.hands[ctx.playerID] = newHand;
@@ -38,13 +39,16 @@ export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
  * @param ctx
  * @param id
  */
-export const revealCard = (G: CahumG, ctx: Ctx, id: string) => {
+export const revealCard = (G: CahumG, ctx: Ctx, card: AnswerCard) => {
   for (const arr of G.table.answers) {
-    const card = arr.find((c) => c.id === id);
-    if (card) {
-      G.table.revealed.push(card);
-      return;
-    }
+    const answer = findCard(card, arr);
+    if (!answer) continue;
+
+    const alreadyRevealed = findCard(answer, G.table.revealed);
+    if (alreadyRevealed) return INVALID_MOVE;
+
+    G.table.revealed.push(answer);
+    return;
   }
 
   return INVALID_MOVE;

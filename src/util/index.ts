@@ -24,4 +24,13 @@ export const shuffle = <T>(arr: T[]) => {
  */
 export const assignRandomID = <T extends AnswerCard | QuestionCard>(
   card: T
-) => ({ ...card, id: v4() });
+): T => ({ ...card, id: v4() });
+
+/**
+ * Finds an answer card in an array based on its id and owner
+ * @param card
+ * @param arr
+ * @returns
+ */
+export const findCard = (card: AnswerCard, arr: AnswerCard[]) =>
+  arr.find((c) => c.id === card.id && c.owner === card.owner);

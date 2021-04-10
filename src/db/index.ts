@@ -1,8 +1,9 @@
 import * as admin from "firebase-admin";
+import { v4 } from "uuid";
 import { DEFAULT_CONFIG } from "../config";
 import { Config } from "../config/config";
 import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
-import { shuffle } from "../util";
+import { assignRandomID, shuffle } from "../util";
 import { dbHelpers } from "../util/db";
 import { CardChangeEvent, LoadIntoMemoryOpts } from "./types";
 
@@ -60,7 +61,7 @@ class Database {
    * Applies a card change event to the in-memory DB
    */
   private processCardChange<T extends Card>(event: CardChangeEvent) {
-    const card = { ...event.doc.data(), id: event.doc.id } as T;
+    const card = { ...event.doc.data(), id: v4() } as T;
 
     if (!this.cardPacks.has(card.pack)) {
       this.cardPacks.set(card.pack, createCardPack(card.pack));
@@ -107,17 +108,19 @@ class Database {
   }
 
   /**
-   * Returns an array of length n containing random answer cards from the given packs
+   * Returns an array of length n containing random answer cards from the given packs.
+   * Each card also contains a randomly generated ID.
    * @param num
    * @param packs
    */
   getAnswerCards(n: number, packs: string[]) {
     const cards = packs.map((pack) => this.cardPacks.get(pack).answers).flat(1);
-    return shuffle(cards).slice(0, n);
+    return shuffle(cards).slice(0, n).map(assignRandomID);
   }
 
   /**
-   * Returns an array of length n containing random answer cards from the given packs
+   * Returns an array of length n containing random answer cards from the given packs.
+   * Each card also contains a randomly generated ID.
    * @param num
    * @param packs
    */
@@ -125,7 +128,7 @@ class Database {
     const cards = packs
       .map((pack) => this.cardPacks.get(pack).questions)
       .flat(1);
-    return shuffle(cards).slice(0, n);
+    return shuffle(cards).slice(0, n).map(assignRandomID);
   }
 }
 
