@@ -56,6 +56,13 @@ class Database {
   }
 
   /**
+   * Returns an array containing the names of every available card pack
+   */
+  getAvailableCardPacks() {
+    return Array.from(this.cardPacks.keys());
+  }
+
+  /**
    * Checks that all given card packs exist
    * @param packs
    */
