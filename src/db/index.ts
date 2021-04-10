@@ -1,9 +1,10 @@
 import * as admin from "firebase-admin";
+import { v4 } from "uuid";
 import { DEFAULT_CONFIG } from "../config";
 import { Config } from "../config/config";
 import { AnswerCard, CardPack, QuestionCard } from "../game/types";
-import { shuffle } from "../helpers";
-import { dbHelpers } from "../helpers/db";
+import { assignRandomID, shuffle } from "../util";
+import { dbHelpers } from "../util/db";
 
 /**
  * Database class, responsible for providing cards to games
@@ -74,37 +75,13 @@ class Database {
   }
 
   /**
-   * Returns all answer and question cards of the given packs
-   * in an object with two fields: answers and questions.
-   *
-   * @param packs
-   */
-  getCards(packs: string[]) {
-    const answers = [] as AnswerCard[];
-    const questions = [] as QuestionCard[];
-
-    for (const name of packs) {
-      if (!this.cardPacks.has(name)) throw new Error("Card pack not found");
-      const pack = this.cardPacks.get(name);
-
-      answers.push(...pack.answers);
-      questions.push(...pack.questions);
-    }
-
-    return {
-      answers,
-      questions,
-    };
-  }
-
-  /**
    * Returns an array of length n containing random answer cards from the given packs
    * @param num
    * @param packs
    */
   getAnswerCards(n: number, packs: string[]) {
     const cards = packs.map((pack) => this.cardPacks.get(pack).answers).flat(1);
-    return shuffle(cards).slice(0, n);
+    return shuffle(cards).slice(0, n).map(assignRandomID);
   }
 
   /**
@@ -116,7 +93,7 @@ class Database {
     const cards = packs
       .map((pack) => this.cardPacks.get(pack).questions)
       .flat(1);
-    return shuffle(cards).slice(0, n);
+    return shuffle(cards).slice(0, n).map(assignRandomID);
   }
 }
 
