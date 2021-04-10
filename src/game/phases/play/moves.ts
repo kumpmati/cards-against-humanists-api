@@ -15,12 +15,13 @@ export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
     return INVALID_MOVE;
   }
 
-  cards.forEach((card) => {
-    G.table.answers.push({
-      ...card,
-      owner: ctx.playerID,
-    });
-  });
+  // set playerID as the owner of the cards
+  const cardsWithOwner = cards.map((card) => ({
+    ...card,
+    owner: ctx.playerID,
+  }));
+
+  G.table.answers.push(cardsWithOwner);
 
   // remove all submitted cards from hand
   const newHand = G.hands[ctx.playerID]?.filter(
@@ -38,13 +39,15 @@ export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
  * @param id
  */
 export const revealCard = (G: CahumG, ctx: Ctx, id: string) => {
-  const card = G.table.answers.find((c) => c.id === id);
-  if (!card) return INVALID_MOVE;
+  for (const arr of G.table.answers) {
+    const card = arr.find((c) => c.id === id);
+    if (card) {
+      G.table.revealed.push(card);
+      return;
+    }
+  }
 
-  const alreadyRevealed = G.table.revealed.find((c) => c.id === id);
-  if (alreadyRevealed) return INVALID_MOVE;
-
-  G.table.revealed.push(card);
+  return INVALID_MOVE;
 };
 
 /**
@@ -54,16 +57,15 @@ export const revealCard = (G: CahumG, ctx: Ctx, id: string) => {
  * @param ctx
  * @param cardID
  */
-export const chooseWinner = (G: CahumG, ctx: Ctx, cardID: string) => {
-  if (typeof cardID !== "string") return INVALID_MOVE;
+export const chooseWinner = (G: CahumG, ctx: Ctx, ownerID: string) => {
+  if (typeof ownerID !== "string") return INVALID_MOVE;
 
-  const winningPlayerID = G.table.answers.find((card) => card.id === cardID)
-    ?.owner;
-  if (!winningPlayerID) return INVALID_MOVE;
+  const player = G.table.answers.find((a) => a[0].owner === ownerID);
+  if (!player) return INVALID_MOVE;
 
-  if (!G.points[winningPlayerID]) G.points[winningPlayerID] = 0;
-  G.points[winningPlayerID] += 1;
+  if (!G.points[ownerID]) G.points[ownerID] = 0;
+  G.points[ownerID] += 1;
 
   // move to next round and set the winner as the next czar
-  ctx.events.endTurn({ next: winningPlayerID });
+  ctx.events.endTurn({ next: ownerID });
 };

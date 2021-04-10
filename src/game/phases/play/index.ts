@@ -103,17 +103,19 @@ const play: PhaseConfig<CahumG> = {
     stages: {
       // players (not Czar) submit their answers
       [PlayStages.submitAnswer]: {
-        moves: { submitAnswer },
+        moves: {
+          submitAnswer: { move: submitAnswer, client: false },
+        },
       },
 
       // Czar reveals answers one by one
       [PlayStages.czarReveals]: {
-        moves: { revealCard },
+        moves: { revealCard: { move: revealCard, client: false } },
       },
 
       // Czar chooses who wins the round
       [PlayStages.chooseWinner]: {
-        moves: { chooseWinner },
+        moves: { chooseWinner: { move: chooseWinner, client: false } },
       },
 
       // cannot do anything while waiting

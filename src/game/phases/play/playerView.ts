@@ -15,11 +15,13 @@ export const playPlayerView = (
 ): CahumGClient => {
   const { table: originalTable, hands, points, state, settings } = G;
 
-  let formattedAnswers: AnswerCard[] = originalTable.answers.slice(0);
+  let formattedAnswers: AnswerCard[][] = originalTable.answers.slice(0);
 
   if (state.stage === PlayStages.submitAnswer) {
     // don't show text on cards until all answers have been submitted
-    formattedAnswers = formattedAnswers.map(hideCardText);
+    formattedAnswers = formattedAnswers.map((answer) =>
+      answer.map(hideCardText)
+    );
   }
 
   if (
@@ -27,9 +29,11 @@ export const playPlayerView = (
     state.stage === PlayStages.czarReveals
   ) {
     if (G.settings.czarReveals) {
-      formattedAnswers = formattedAnswers.map((card) =>
-        showCardIfRevealed(card, originalTable.revealed)
-      );
+      formattedAnswers = formattedAnswers.map((answer) => {
+        return answer.map((card) =>
+          showCardIfRevealed(card, originalTable.revealed)
+        );
+      });
     }
   }
 

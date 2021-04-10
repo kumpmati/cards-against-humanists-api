@@ -25,7 +25,7 @@ export interface CardPack {
 export type CahumG = {
   table: {
     question: QuestionCard;
-    answers: AnswerCard[];
+    answers: AnswerCard[][];
     revealed: AnswerCard[];
   };
   points: Record<string, number>;
