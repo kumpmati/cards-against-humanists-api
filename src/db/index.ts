@@ -2,9 +2,9 @@ import * as admin from "firebase-admin";
 import { DEFAULT_CONFIG } from "../config";
 import { Config } from "../config/config";
 import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
-import { assignRandomID, shuffle } from "../util";
+import { shuffle } from "../util";
 import { dbHelpers } from "../util/db";
-import { CardChangeEvent, LoadIntoMemoryOpts, LoadOpts } from "./types";
+import { CardChangeEvent, LoadIntoMemoryOpts } from "./types";
 
 /**
  * Database class, responsible for providing cards to games
@@ -89,27 +89,6 @@ class Database {
   }
 
   /**
-   * Loads cards into memory
-   */
-  private loadIntoMemory({ answers, questions }: LoadIntoMemoryOpts) {
-    for (const card of answers) {
-      if (!this.cardPacks.has(card.pack)) {
-        this.cardPacks.set(card.pack, createCardPack(card.pack));
-      }
-
-      this.cardPacks.get(card.pack).answers.push(card);
-    }
-
-    for (const card of questions) {
-      if (!this.cardPacks.has(card.pack)) {
-        this.cardPacks.set(card.pack, createCardPack(card.pack));
-      }
-
-      this.cardPacks.get(card.pack).questions.push(card);
-    }
-  }
-
-  /**
    * Returns an array containing the names of every available card pack
    */
   getAvailableCardPacks() {
@@ -134,7 +113,7 @@ class Database {
    */
   getAnswerCards(n: number, packs: string[]) {
     const cards = packs.map((pack) => this.cardPacks.get(pack).answers).flat(1);
-    return shuffle(cards).slice(0, n).map(assignRandomID);
+    return shuffle(cards).slice(0, n);
   }
 
   /**
@@ -146,7 +125,7 @@ class Database {
     const cards = packs
       .map((pack) => this.cardPacks.get(pack).questions)
       .flat(1);
-    return shuffle(cards).slice(0, n).map(assignRandomID);
+    return shuffle(cards).slice(0, n);
   }
 }
 
