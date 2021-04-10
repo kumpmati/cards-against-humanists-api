@@ -10,12 +10,14 @@ import { AnswerCard, CahumG } from "../../types";
  * @param args
  */
 export const submitAnswer = (G: CahumG, ctx: Ctx, cards: AnswerCard[]) => {
-  if (!Array.isArray(cards)) return INVALID_MOVE;
+  const requiredCards = G.table.question?.required_cards;
+  if (!Array.isArray(cards) || cards.length !== requiredCards) {
+    return INVALID_MOVE;
+  }
 
-  cards.forEach((card, i) => {
+  cards.forEach((card) => {
     G.table.answers.push({
       ...card,
-      id: `${ctx.playerID}-${i}`,
       owner: ctx.playerID,
     });
   });
@@ -50,12 +52,13 @@ export const revealCard = (G: CahumG, ctx: Ctx, id: string) => {
  * Only the current Czar can make this move.
  * @param G
  * @param ctx
- * @param id
+ * @param cardID
  */
-export const chooseWinner = (G: CahumG, ctx: Ctx, id: string) => {
-  if (typeof id !== "string") return INVALID_MOVE;
+export const chooseWinner = (G: CahumG, ctx: Ctx, cardID: string) => {
+  if (typeof cardID !== "string") return INVALID_MOVE;
 
-  const winningPlayerID = G.table.answers.find((card) => card.id === id)?.owner;
+  const winningPlayerID = G.table.answers.find((card) => card.id === cardID)
+    ?.owner;
   if (!winningPlayerID) return INVALID_MOVE;
 
   if (!G.points[winningPlayerID]) G.points[winningPlayerID] = 0;
