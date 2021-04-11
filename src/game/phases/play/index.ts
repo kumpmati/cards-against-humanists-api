@@ -51,6 +51,7 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
 
     const numMissingCards = NUM_CARDS - G.hands[i].length;
     const answers = getAnswers(G, numMissingCards);
+    if (!answers) continue;
 
     G.hands[i].push(...answers);
   }
