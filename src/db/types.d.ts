@@ -7,6 +7,7 @@ export interface GetCardsOpts<T extends Card> {
   n: number;
   packs: string[];
   startIndex: number;
+  seed?: string;
 }
 
 type CardTypeAsString<T extends Card> = T extends QuestionCard

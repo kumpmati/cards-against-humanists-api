@@ -142,19 +142,22 @@ class Database {
     type,
     packs,
     startIndex = 0,
+    seed,
   }: GetCardsOpts<T>): GetCardsResult<T> {
     const selector = type === "answer" ? "answers" : "questions";
 
-    // TODO: shuffle cards based on some seed (e.g. matchID)
-    const _cards = packs
+    const unshuffledCards = packs
       .map((pack) => this.cardPacks.get(pack)[selector])
       .flat(1) as T[];
+
+    // shuffle cards before iterating them to get a 'shuffled deck' effect
+    const shuffledCards = shuffle(unshuffledCards, seed);
 
     const arr = [] as T[];
 
     for (let i = 0; i < n; i++) {
-      const index = (startIndex + i) % _cards.length;
-      arr.push(_cards[index]);
+      const index = (startIndex + i) % shuffledCards.length;
+      arr.push(shuffledCards[index]);
     }
 
     return {

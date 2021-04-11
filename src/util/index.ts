@@ -1,17 +1,19 @@
-import { Ctx } from "boardgame.io";
 import { v4 } from "uuid";
 import { AnswerCard, QuestionCard } from "../game/types";
+import RND from "seedrandom";
 
 /**
  * Returns a shuffled copy of the given array
  * @param arr
  * @returns
  */
-export const shuffle = <T>(arr: T[]) => {
+export const shuffle = <T>(arr: T[], seed?: string) => {
+  const random = RND(seed ?? "cahum");
+
   const copy = arr.slice(0);
 
   for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
 

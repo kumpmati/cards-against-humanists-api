@@ -38,6 +38,7 @@ export type CahumG = {
   db: {
     answerDeckIndex: number;
     questionDeckIndex: number;
+    seed: string;
   };
 };
 

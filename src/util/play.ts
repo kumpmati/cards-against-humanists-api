@@ -32,6 +32,7 @@ export const getAnswers = (G: CahumG, num: number) => {
     n: num,
     startIndex: G.db.answerDeckIndex,
     packs: G.settings.packs,
+    seed: G.db.seed,
   });
 
   G.db.answerDeckIndex = query.newIndex;
@@ -44,6 +45,7 @@ export const getQuestions = (G: CahumG, num: number) => {
     n: num,
     startIndex: G.db.questionDeckIndex,
     packs: G.settings.packs,
+    seed: G.db.seed,
   });
 
   G.db.questionDeckIndex = query.newIndex;

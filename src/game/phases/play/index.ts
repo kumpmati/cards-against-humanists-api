@@ -1,6 +1,5 @@
 import { Ctx, PhaseConfig } from "boardgame.io";
 import { NUM_CARDS } from "../..";
-import { DB } from "../../../db";
 import { shuffle } from "../../../util";
 import {
   allCardsRevealed,
@@ -10,7 +9,7 @@ import {
   numPlayersAtStage,
   setStage,
 } from "../../../util/play";
-import { AnswerCard, CahumG, QuestionCard } from "../../types";
+import { CahumG } from "../../types";
 import { submitAnswer, chooseWinner, revealCard } from "./moves";
 
 export enum PlayStages {

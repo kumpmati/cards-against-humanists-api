@@ -4,6 +4,7 @@ import { playPlayerView } from "./phases/play/playerView";
 import { validateSetupData } from "./setup";
 import waitForPlayers from "./phases/waitForPlayers";
 import { CahumG, SetupData } from "./types";
+import { v4 } from "uuid";
 
 export const NUM_CARDS = 7;
 
@@ -33,6 +34,7 @@ export const Cahum: Game<CahumG> = {
       db: {
         answerDeckIndex: 0,
         questionDeckIndex: 0,
+        seed: v4(), // used when shuffling cards from DB
       },
     };
   },
