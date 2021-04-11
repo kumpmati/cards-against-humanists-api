@@ -2,7 +2,12 @@ import * as admin from "firebase-admin";
 import { DEFAULT_CONFIG } from "../config";
 import { Config } from "../config/config";
 import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
-import { assignRandomID, shuffle } from "../util";
+import {
+  assignRandomID,
+  cardIsAnswerCard,
+  createCardPack,
+  shuffle,
+} from "../util";
 import { dbHelpers } from "../util/db";
 import { CardChangeEvent, GetCardsOpts, GetCardsResult } from "./types";
 
@@ -168,12 +173,3 @@ class Database {
 }
 
 export const DB = new Database(DEFAULT_CONFIG);
-
-const createCardPack = (name: string): CardPack => ({
-  name,
-  answers: [] as AnswerCard[],
-  questions: [] as QuestionCard[],
-});
-
-const cardIsAnswerCard = (card: Card): card is AnswerCard =>
-  !card.hasOwnProperty("required_cards");

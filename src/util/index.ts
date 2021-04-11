@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { AnswerCard, QuestionCard } from "../game/types";
+import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
 import RND from "seedrandom";
 
 /**
@@ -37,3 +37,12 @@ export const assignRandomID = <T extends AnswerCard | QuestionCard>(
  */
 export const findCard = (card: AnswerCard, arr: AnswerCard[]) =>
   arr.find((c) => c.id === card.id && c.owner === card.owner);
+
+export const createCardPack = (name: string): CardPack => ({
+  name,
+  answers: [] as AnswerCard[],
+  questions: [] as QuestionCard[],
+});
+
+export const cardIsAnswerCard = (card: Card): card is AnswerCard =>
+  !card.hasOwnProperty("required_cards");
