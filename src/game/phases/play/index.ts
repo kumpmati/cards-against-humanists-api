@@ -40,7 +40,7 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
 
   // reset table state
   G.table = {
-    question: getQuestions(G, 1)[0],
+    question: getQuestions(G, 1)?.[0],
     answers: [],
     revealed: [],
   };
