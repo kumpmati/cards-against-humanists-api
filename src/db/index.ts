@@ -53,15 +53,32 @@ class Database {
       });
     });
 
-    await Promise.all([answersPromise, questionsPromise]);
-    console.log("Cards loaded");
+    await Promise.all([answersPromise, questionsPromise]).then(() => {
+      const totalAnswers = Array.from(this.cardPacks.values()).reduce(
+        (sum, curr) => sum + curr.answers.length,
+        0
+      );
+      const totalQuestions = Array.from(this.cardPacks.values()).reduce(
+        (sum, curr) => sum + curr.questions.length,
+        0
+      );
+      console.log(
+        "Loaded",
+        totalAnswers,
+        "answers and",
+        totalQuestions,
+        "questions"
+      );
+    });
   }
 
   /**
    * Applies a card change event to the in-memory DB
    */
   private processCardChange<T extends Card>(event: CardChangeEvent) {
-    const card = { ...event.doc.data(), id: v4() } as T;
+    // use firebase document id as the card id so that
+    // the cards can be queried easily in-memory as well
+    const card = { ...event.doc.data(), id: event.doc.id } as T;
 
     if (!this.cardPacks.has(card.pack)) {
       this.cardPacks.set(card.pack, createCardPack(card.pack));
@@ -73,18 +90,26 @@ class Database {
     switch (event.type) {
       case "added": {
         arr.push(card);
+        console.log("[DB] - added", card);
         break;
       }
 
       case "modified": {
+        // TODO: handle cases where card pack is changed
         const index = arr.findIndex((c) => c.id === card.id);
-        if (index !== -1) arr[index] = card;
+        if (index !== -1) {
+          console.log("[DB] - modified", arr[index], "to", card);
+          arr[index] = card;
+        }
         break;
       }
 
       case "removed": {
         const index = arr.findIndex((c) => c.id === card.id);
-        if (index !== -1) arr.splice(index, 1);
+        if (index !== -1) {
+          console.log("[DB] - removed", card);
+          arr.splice(index, 1);
+        }
       }
     }
   }
