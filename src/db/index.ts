@@ -156,6 +156,11 @@ class Database {
   }: GetCardsOpts<T>): GetCardsResult<T> {
     const selector = type === "answer" ? "answers" : "questions";
 
+    if (!this.checkCardPacksExist(packs)) {
+      console.warn("One of these packs does not exist:", packs);
+      return null;
+    }
+
     const unshuffledCards = packs
       .map((pack) => this.cardPacks.get(pack)[selector])
       .flat(1) as T[];
