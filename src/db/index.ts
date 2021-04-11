@@ -165,32 +165,6 @@ class Database {
       cards: arr.map(assignRandomID),
     };
   }
-
-  /**
-   * Returns an array of length n containing random answer cards from the given packs.
-   * Each card also contains a randomly generated ID.
-   * @param num
-   * @param packs
-   * @param startIndex
-   */
-  getAnswerCards(n: number, packs: string[]) {
-    const cards = packs.map((pack) => this.cardPacks.get(pack).answers).flat(1);
-    return shuffle(cards).slice(0, n).map(assignRandomID);
-  }
-
-  /**
-   * Returns an array of length n containing random answer cards from the given packs.
-   * Each card also contains a randomly generated ID.
-   * @param num
-   * @param packs
-   * @param startIndex
-   */
-  getQuestionCards(n: number, packs: string[]) {
-    const cards = packs
-      .map((pack) => this.cardPacks.get(pack).questions)
-      .flat(1);
-    return shuffle(cards).slice(0, n).map(assignRandomID);
-  }
 }
 
 export const DB = new Database(DEFAULT_CONFIG);
