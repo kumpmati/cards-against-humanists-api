@@ -1,11 +1,10 @@
 import * as admin from "firebase-admin";
-import { v4 } from "uuid";
 import { DEFAULT_CONFIG } from "../config";
 import { Config } from "../config/config";
 import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
 import { assignRandomID, shuffle } from "../util";
 import { dbHelpers } from "../util/db";
-import { CardChangeEvent, LoadIntoMemoryOpts } from "./types";
+import { CardChangeEvent, GetCardsOpts, GetCardsResult } from "./types";
 
 /**
  * Database class, responsible for providing cards to games
@@ -133,10 +132,43 @@ class Database {
   }
 
   /**
+   * Returns an array of length n containing random cards from the given packs.
+   * Each card has a randomly generated ID (generated each time)
+   * @param opts {type, n, packs, startIndex = 0}
+   * @returns {GetCardsResult}
+   */
+  getCards<T extends Card>({
+    n,
+    type,
+    packs,
+    startIndex = 0,
+  }: GetCardsOpts<T>): GetCardsResult<T> {
+    const selector = type === "answer" ? "answers" : "questions";
+
+    // TODO: shuffle cards based on some seed (e.g. matchID)
+    const _cards = packs
+      .map((pack) => this.cardPacks.get(pack)[selector])
+      .flat(1) as T[];
+
+    const arr = [] as T[];
+
+    for (let i = 0; i < n; i++) {
+      const index = (startIndex + i) % _cards.length;
+      arr.push(_cards[index]);
+    }
+
+    return {
+      newIndex: startIndex + n,
+      cards: arr.map(assignRandomID),
+    };
+  }
+
+  /**
    * Returns an array of length n containing random answer cards from the given packs.
    * Each card also contains a randomly generated ID.
    * @param num
    * @param packs
+   * @param startIndex
    */
   getAnswerCards(n: number, packs: string[]) {
     const cards = packs.map((pack) => this.cardPacks.get(pack).answers).flat(1);
@@ -148,6 +180,7 @@ class Database {
    * Each card also contains a randomly generated ID.
    * @param num
    * @param packs
+   * @param startIndex
    */
   getQuestionCards(n: number, packs: string[]) {
     const cards = packs

@@ -4,12 +4,13 @@ import { DB } from "../../../db";
 import { shuffle } from "../../../util";
 import {
   allCardsRevealed,
+  getAnswers,
+  getQuestions,
   isAtStage,
-  numAnswers,
   numPlayersAtStage,
   setStage,
 } from "../../../util/play";
-import { CahumG } from "../../types";
+import { AnswerCard, CahumG, QuestionCard } from "../../types";
 import { submitAnswer, chooseWinner, revealCard } from "./moves";
 
 export enum PlayStages {
@@ -39,7 +40,7 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
 
   // reset table state
   G.table = {
-    question: DB.getQuestionCards(1, G.settings.packs)[0], // random question from DB
+    question: getQuestions(G, 1)[0],
     answers: [],
     revealed: [],
   };
@@ -50,9 +51,9 @@ const onBegin = (G: CahumG, ctx: Ctx) => {
     if (!G.hands[i]) G.hands[i] = [];
 
     const numMissingCards = NUM_CARDS - G.hands[i].length;
-    const newCards = DB.getAnswerCards(numMissingCards, G.settings.packs);
+    const answers = getAnswers(G, numMissingCards);
 
-    G.hands[i].push(...newCards);
+    G.hands[i].push(...answers);
   }
 };
 

@@ -30,6 +30,10 @@ export const Cahum: Game<CahumG> = {
       points: {},
       hands: {},
       settings: setupData,
+      db: {
+        answerDeckIndex: 0,
+        questionDeckIndex: 0,
+      },
     };
   },
 

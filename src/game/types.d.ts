@@ -35,9 +35,13 @@ export type CahumG = {
     stage: PlayStages;
   };
   settings: SetupData;
+  db: {
+    answerDeckIndex: number;
+    questionDeckIndex: number;
+  };
 };
 
-export interface CahumGClient extends Omit<CahumG, "hands"> {
+export interface CahumGClient extends Omit<CahumG, "hands" | "db"> {
   hand: AnswerCard[];
 }
 
