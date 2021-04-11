@@ -44,5 +44,15 @@ export const createCardPack = (name: string): CardPack => ({
   questions: [] as QuestionCard[],
 });
 
+export const isCard = (card: any): card is Card =>
+  typeof card === "object" &&
+  card.hasOwnProperty("pack") &&
+  typeof card.pack === "string" &&
+  card.hasOwnProperty("text") &&
+  typeof card.text === "string";
+
 export const cardIsAnswerCard = (card: Card): card is AnswerCard =>
-  !card.hasOwnProperty("required_cards");
+  isCard(card) && !card.hasOwnProperty("required_cards");
+
+export const cardIsQuestionCard = (card: Card): card is QuestionCard =>
+  isCard(card) && card.hasOwnProperty("required_cards");

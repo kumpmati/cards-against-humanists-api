@@ -5,11 +5,18 @@ import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
 import {
   assignRandomID,
   cardIsAnswerCard,
+  cardIsQuestionCard,
   createCardPack,
+  isCard,
   shuffle,
 } from "../util";
 import { dbHelpers } from "../util/db";
-import { CardChangeEvent, GetCardsOpts, GetCardsResult } from "./types";
+import {
+  CardChangeEvent,
+  CardTypeAsString,
+  GetCardsOpts,
+  GetCardsResult,
+} from "./types";
 
 /**
  * Database class, responsible for providing cards to games
@@ -35,6 +42,7 @@ class Database {
 
   /**
    * Loads all cards into memory from the database.
+   * Listens to real-time updates from firestore and updates in-memory db to match
    */
   async load() {
     console.log("Loading cards");
@@ -43,7 +51,7 @@ class Database {
       this.db.answers.onSnapshot((snapshot) => {
         snapshot
           .docChanges()
-          .forEach((change) => this.processCardChange<AnswerCard>(change));
+          .forEach((change) => this.onCardChange<AnswerCard>(change));
         resolve();
       });
     });
@@ -52,7 +60,7 @@ class Database {
       this.db.questions.onSnapshot((snapshot) => {
         snapshot
           .docChanges()
-          .forEach((change) => this.processCardChange<QuestionCard>(change));
+          .forEach((change) => this.onCardChange<QuestionCard>(change));
         resolve();
       });
     });
@@ -77,9 +85,9 @@ class Database {
   }
 
   /**
-   * Applies a card change event to the in-memory DB
+   * Handles card change events coming from firestore
    */
-  private processCardChange<T extends Card>(event: CardChangeEvent) {
+  private onCardChange<T extends Card>(event: CardChangeEvent) {
     // use firebase document id as the card id so that
     // the cards can be queried easily in-memory as well
     const card = { ...event.doc.data(), id: event.doc.id } as T;
@@ -94,7 +102,6 @@ class Database {
     switch (event.type) {
       case "added": {
         arr.push(card);
-        console.log("[DB] - added", card);
         break;
       }
 
@@ -102,7 +109,6 @@ class Database {
         // TODO: handle cases where card pack is changed
         const index = arr.findIndex((c) => c.id === card.id);
         if (index !== -1) {
-          console.log("[DB] - modified", arr[index], "to", card);
           arr[index] = card;
         }
         break;
@@ -111,7 +117,6 @@ class Database {
       case "removed": {
         const index = arr.findIndex((c) => c.id === card.id);
         if (index !== -1) {
-          console.log("[DB] - removed", card);
           arr.splice(index, 1);
         }
       }
@@ -169,6 +174,42 @@ class Database {
       newIndex: startIndex + n,
       cards: arr.map(assignRandomID),
     };
+  }
+
+  /**
+   * Adds a card to the database.
+   * Validates the card before sending it to firestore.
+   * @returns ID of the newly created card
+   */
+  async addCard(card: Omit<Card, "id">): Promise<string> {
+    if (!isCard(card)) throw new Error("Invalid card");
+
+    if (cardIsAnswerCard(card)) {
+      const ref = await this.db.answers.add(card);
+      return ref.id;
+    } else if (cardIsQuestionCard(card)) {
+      const ref = await this.db.questions.add(card);
+      return ref.id;
+    }
+  }
+
+  /**
+   * Removes a card from the database
+   * @param card
+   */
+  async removeCard<T extends Card>(
+    id: string,
+    type: CardTypeAsString<T>
+  ): Promise<any> {
+    try {
+      if (type === "answer") {
+        await this.db.answers.doc(id).delete();
+      } else if (type === "question") {
+        await this.db.questions.doc(id).delete();
+      }
+    } catch (e) {
+      console.warn(e);
+    }
   }
 }
 
