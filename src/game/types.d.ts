@@ -7,6 +7,7 @@ export interface QuestionCard {
   text: string;
   required_cards: number;
   pack: string;
+  extra?: Record<string, any>;
 }
 
 export interface AnswerCard {
@@ -14,10 +15,12 @@ export interface AnswerCard {
   owner?: string;
   text: string;
   pack: string;
+  extra?: Record<string, any>;
 }
 
 export interface CardPack {
   name: string;
+  code: string;
   questions: QuestionCard[];
   answers: AnswerCard[];
 }

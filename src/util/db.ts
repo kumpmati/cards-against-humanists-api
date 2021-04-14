@@ -9,6 +9,7 @@ import { AnswerCard, QuestionCard } from "../game/types";
 export const dbHelpers = (db: firestore.Firestore) => ({
   answers: db.collection("/answers").withConverter(answerCardConverter),
   questions: db.collection("/questions").withConverter(questionCardConverter),
+  packs: db.collection("/packs").withConverter(cardPackConverter),
 });
 
 const converter = <T>() => ({
@@ -19,3 +20,4 @@ const converter = <T>() => ({
 
 const questionCardConverter = converter<QuestionCard>();
 const answerCardConverter = converter<AnswerCard>();
+const cardPackConverter = converter<any>();

@@ -12,10 +12,12 @@ import {
 } from "../util";
 import { dbHelpers } from "../util/db";
 import {
-  CardChangeEvent,
+  ChangeEvent,
   CardTypeAsString,
   GetCardsOpts,
   GetCardsResult,
+  FirestoreCardPack,
+  Snapshot,
 } from "./types";
 
 /**
@@ -45,6 +47,18 @@ class Database {
    * Listens to real-time updates from firestore and updates in-memory db to match
    */
   async load() {
+    console.log("Loading card packs");
+
+    // load card packs before cards
+    await new Promise<void>((resolve) => {
+      this.db.packs.onSnapshot((snapshot) => {
+        snapshot
+          .docChanges()
+          .forEach((change: ChangeEvent) => this.onCardPackChange(change));
+        resolve();
+      });
+    });
+
     console.log("Loading cards");
 
     const answersPromise = new Promise<void>((resolve) => {
@@ -57,7 +71,7 @@ class Database {
     });
 
     const questionsPromise = new Promise<void>((resolve) => {
-      this.db.questions.onSnapshot((snapshot) => {
+      this.db.questions.onSnapshot((snapshot: Snapshot<QuestionCard>) => {
         snapshot
           .docChanges()
           .forEach((change) => this.onCardChange<QuestionCard>(change));
@@ -74,6 +88,7 @@ class Database {
         (sum, curr) => sum + curr.questions.length,
         0
       );
+
       console.log(
         "Loaded",
         totalAnswers,
@@ -85,15 +100,36 @@ class Database {
   }
 
   /**
+   * Handles card pack change events coming from firestore
+   * @param event
+   */
+  private onCardPackChange(event: ChangeEvent) {
+    const doc = event.doc.data() as FirestoreCardPack;
+
+    switch (event.type) {
+      case "added":
+        if (!this.cardPacks.has(doc.value)) {
+          this.cardPacks.set(doc.value, createCardPack(doc.text, doc.value));
+        } else console.log("duplicate card pack:", doc.value);
+        break;
+
+      case "removed":
+        this.cardPacks.delete(doc.value);
+        break;
+    }
+  }
+
+  /**
    * Handles card change events coming from firestore
    */
-  private onCardChange<T extends Card>(event: CardChangeEvent) {
+  private onCardChange<T extends Card>(event: ChangeEvent) {
     // use firebase document id as the card id so that
     // the cards can be queried easily in-memory as well
     const card = { ...event.doc.data(), id: event.doc.id } as T;
 
     if (!this.cardPacks.has(card.pack)) {
-      this.cardPacks.set(card.pack, createCardPack(card.pack));
+      console.warn("card pack", card.pack, "does not exist!");
+      //this.cardPacks.set(card.pack, createCardPack(card.pack));
     }
 
     const pack = this.cardPacks.get(card.pack);
@@ -127,7 +163,10 @@ class Database {
    * Returns an array containing the names of every available card pack
    */
   getAvailableCardPacks() {
-    return Array.from(this.cardPacks.keys());
+    return Array.from(this.cardPacks.values()).map((pack) => ({
+      text: pack.name,
+      value: pack.code,
+    }));
   }
 
   /**

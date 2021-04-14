@@ -1,6 +1,7 @@
-import { AnswerCard, Card, QuestionCard } from "../game/types";
+import { Card, QuestionCard } from "../game/types";
 
-export type CardChangeEvent = FirebaseFirestore.DocumentChange<FirebaseFirestore.DocumentData>;
+export type ChangeEvent = FirebaseFirestore.DocumentChange<FirebaseFirestore.DocumentData>;
+export type Snapshot<T> = FirebaseFirestore.QuerySnapshot<T>;
 
 export interface GetCardsOpts<T extends Card> {
   type: CardTypeAsString<T>;
@@ -17,4 +18,9 @@ type CardTypeAsString<T extends Card> = T extends QuestionCard
 export interface GetCardsResult<T extends Card> {
   cards: T[];
   newIndex: number;
+}
+
+export interface FirestoreCardPack {
+  text: string;
+  value: string;
 }

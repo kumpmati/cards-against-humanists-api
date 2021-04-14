@@ -6,6 +6,7 @@ import { DEFAULT_CONFIG } from "./config";
 import { apiCardsHandler } from "./api/cards";
 import bodyparser from "koa-bodyparser";
 import { DB } from "./db";
+import { apiCardPacksHandler } from "./api/packs";
 
 const start = async () => {
   await DB.load(); // load db before starting server
@@ -16,7 +17,7 @@ const start = async () => {
   });
 
   server.router.post("/cards", bodyparser(), apiCardsHandler);
-
+  server.router.get("/packs", apiCardPacksHandler);
   server.run(DEFAULT_CONFIG.port);
 };
 

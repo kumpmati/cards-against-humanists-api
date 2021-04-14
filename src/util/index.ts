@@ -38,8 +38,9 @@ export const assignRandomID = <T extends AnswerCard | QuestionCard>(
 export const findCard = (card: AnswerCard, arr: AnswerCard[]) =>
   arr.find((c) => c.id === card.id && c.owner === card.owner);
 
-export const createCardPack = (name: string): CardPack => ({
+export const createCardPack = (name: string, code: string): CardPack => ({
   name,
+  code,
   answers: [] as AnswerCard[],
   questions: [] as QuestionCard[],
 });
