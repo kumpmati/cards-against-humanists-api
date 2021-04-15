@@ -77,8 +77,6 @@ class Database {
       });
     });
 
-    console.log("Loading cards");
-
     const answersPromise = new Promise<void>((resolve) => {
       this.db.answers.onSnapshot((snapshot) => {
         snapshot
