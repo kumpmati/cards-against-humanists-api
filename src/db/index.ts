@@ -126,7 +126,7 @@ class Database {
     const card = { ...event.doc.data(), id: event.doc.id } as T;
 
     if (!this.cardPacks.has(card.pack)) {
-      console.warn("card pack", card.pack, "does not exist!");
+      console.warn("card pack", card.pack, "does not exist! card id:", card.id);
       return;
     }
 
