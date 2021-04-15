@@ -23,8 +23,9 @@ export interface DBConnector {
   get: <T extends Card>(opts: DBConnectorRequest) => Promise<T[]>;
   add: (card: Omit<Card, "id">) => Promise<string>;
   getAll: () => Promise<CardPack[]>;
-  onChange: (...args: any[]) => Promise<any>;
-  detach: (...args: any) => Promise<any>;
+  attachListeners: (...args: any[]) => Promise<any>;
+  detachListeners: () => Promise<any>;
+  disconnect: (...args: any) => Promise<any>;
 }
 
 export interface DBConnectorRequest {

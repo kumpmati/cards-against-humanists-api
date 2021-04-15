@@ -95,17 +95,19 @@ export class FirebaseConnector implements DBConnector {
   }
 
   /**
-   * TODO
+   * TODO: attachListeners
    */
-  async onChange(): Promise<any> {
-    this.verifyIsInitialized();
-    throw new Error("onChange unimplemented");
-  }
+  async attachListeners() {}
+
+  /**
+   * TODO: detachListeners
+   */
+  async detachListeners() {}
 
   /**
    * Disconnects from Firebase
    */
-  async detach() {
+  async disconnect() {
     console.log("Disconnecting Firebase connector");
 
     await this.firestore.terminate();
