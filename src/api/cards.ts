@@ -1,8 +1,7 @@
 import { Server } from "boardgame.io";
 import Router from "koa-router";
 import { DB } from "../db";
-import { CardPack } from "../game/types";
-import { isCard } from "../util";
+import { intoArray, isCard } from "../util";
 
 /**
  * Handles POST requests to /cards/new
@@ -44,19 +43,17 @@ export const newCardHandler: Router.IMiddleware<any, Server.AppCtx> = async (
 export const getCardsHandler: Router.IMiddleware<any, Server.AppCtx> = async (
   ctx
 ) => {
-  let query = Array.isArray(ctx.query?.packs)
-    ? ctx.query?.packs
-    : [ctx.query?.packs];
-  if (!query) {
+  if (!ctx.query?.packs) {
     ctx.status = 400;
     return;
   }
 
-  if (query.length === 1 && query[0] === "all") {
-    query = DB.getCardPacks().map((pack) => pack.code);
+  let packs = intoArray<string>(ctx.query?.packs);
+  if (packs[0] === "all") {
+    packs = DB.getCardPacks().map((pack) => pack.code);
   }
 
   ctx.body = {
-    packs: DB.getCardPacks().filter((pack) => query.includes(pack.code)),
+    packs: DB.getCardPacks().filter((pack) => packs.includes(pack.code)),
   };
 };

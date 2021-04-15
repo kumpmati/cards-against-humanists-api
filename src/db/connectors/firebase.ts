@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import { Config } from "../../config/config";
 import { AnswerCard, Card, CardPack, QuestionCard } from "../../game/types";
-import { cardIsAnswerCard, createCardPack } from "../../util";
+import { isAnswerCard, createCardPack } from "../../util";
 import { DBConnector, DBConnectorRequest, FirestoreCardPack } from "../types";
 
 /**
@@ -89,7 +89,7 @@ export class FirebaseConnector implements DBConnector {
    * @returns ID of the new document in Firestore
    */
   async add(card: Card): Promise<string> {
-    const path = cardIsAnswerCard(card) ? "/answers" : "/questions";
+    const path = isAnswerCard(card) ? "/answers" : "/questions";
     const collection = this.firestore.collection(path);
 
     return (await collection.add(card)).id;

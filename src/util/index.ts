@@ -3,6 +3,9 @@ import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
 import RND from "seedrandom";
 import { FirestoreCardPack } from "../db/types";
 
+export const intoArray = <T>(src: any): T[] =>
+  Array.isArray(src) ? src : [src];
+
 /**
  * Returns a shuffled copy of the given array
  * @param arr
@@ -54,8 +57,8 @@ export const isCard = (card: any): card is Card =>
   card.hasOwnProperty("text") &&
   typeof card.text === "string";
 
-export const cardIsAnswerCard = (card: Card): card is AnswerCard =>
+export const isAnswerCard = (card: Card): card is AnswerCard =>
   isCard(card) && !card.hasOwnProperty("required_cards");
 
-export const cardIsQuestionCard = (card: Card): card is QuestionCard =>
+export const isQuestionCard = (card: Card): card is QuestionCard =>
   isCard(card) && card.hasOwnProperty("required_cards");
