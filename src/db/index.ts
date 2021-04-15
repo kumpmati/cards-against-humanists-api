@@ -11,6 +11,7 @@ import {
   shuffle,
 } from "../util";
 import { dbHelpers } from "../util/db";
+import { loadCardsFromDisk } from "./disk";
 import {
   ChangeEvent,
   CardTypeAsString,
@@ -42,12 +43,29 @@ class Database {
     this.db = dbHelpers(this._firestore);
   }
 
+  async loadFromDisk(path: string) {
+    console.log("Loading cards from disk:", path);
+    const contents = await loadCardsFromDisk(path);
+    for (const pack of contents) {
+      this.cardPacks.set(pack.code, pack);
+    }
+
+    const total = this.getTotalCards();
+    console.log(
+      "Loaded",
+      total.answers,
+      "answers and",
+      total.questions,
+      "questions from disk"
+    );
+  }
+
   /**
    * Loads all cards into memory from the database.
    * Listens to real-time updates from firestore and updates in-memory db to match
    */
   async load() {
-    console.log("Loading card packs");
+    console.log("Loading card packs from Firestore");
 
     // load card packs before cards
     await new Promise<void>((resolve) => {
@@ -80,20 +98,13 @@ class Database {
     });
 
     await Promise.all([answersPromise, questionsPromise]).then(() => {
-      const totalAnswers = Array.from(this.cardPacks.values()).reduce(
-        (sum, curr) => sum + curr.answers.length,
-        0
-      );
-      const totalQuestions = Array.from(this.cardPacks.values()).reduce(
-        (sum, curr) => sum + curr.questions.length,
-        0
-      );
+      const total = this.getTotalCards();
 
       console.log(
         "Loaded",
-        totalAnswers,
+        total.answers,
         "answers and",
-        totalQuestions,
+        total.questions,
         "questions"
       );
     });
@@ -180,6 +191,10 @@ class Database {
     return true;
   }
 
+  getCardPack(code: string) {
+    return this.cardPacks.get(code);
+  }
+
   /**
    * Returns an array of length n containing random cards from the given packs.
    * Each card has a randomly generated ID (generated each time)
@@ -254,6 +269,23 @@ class Database {
     } catch (e) {
       console.warn(e);
     }
+  }
+
+  /**
+   * Returns an object containing the total number of cards in memory.
+   * @returns
+   */
+  private getTotalCards() {
+    const answers = Array.from(this.cardPacks.values()).reduce(
+      (sum, curr) => sum + curr.answers.length,
+      0
+    );
+    const questions = Array.from(this.cardPacks.values()).reduce(
+      (sum, curr) => sum + curr.questions.length,
+      0
+    );
+
+    return { answers, questions };
   }
 }
 
