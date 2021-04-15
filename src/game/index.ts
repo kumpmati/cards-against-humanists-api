@@ -39,7 +39,6 @@ export const Cahum: Game<CahumG> = {
     };
   },
 
-  // TODO: check if card packs exist
   validateSetupData,
   playerView: playPlayerView,
 

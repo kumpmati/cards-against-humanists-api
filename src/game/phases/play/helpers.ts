@@ -1,6 +1,6 @@
 import { Ctx } from "boardgame.io";
 import { assignRandomID, shuffle } from "../../../util";
-import { DB } from "../../../db/db";
+import { DB } from "../../../db";
 import { DBRequest } from "../../../db/types";
 import { PlayStages } from ".";
 import { AnswerCard, CahumG, Card, QuestionCard } from "../../types";

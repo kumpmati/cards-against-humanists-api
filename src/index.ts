@@ -3,8 +3,8 @@ import { v4 } from "uuid";
 import { Cahum } from "./game";
 import { DEFAULT_CONFIG } from "./config";
 import { attachApiRoutes } from "./api";
-import { DB } from "./db/db";
-import { FirebaseConnector } from "./db/firebase";
+import { DB } from "./db";
+import { FirebaseConnector } from "./db/connectors/firebase";
 
 const uuid = () => v4().slice(0, 5);
 

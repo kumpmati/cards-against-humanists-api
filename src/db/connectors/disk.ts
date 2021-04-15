@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises";
-import { CardPack } from "../game/types";
+import { CardPack } from "../../game/types";
 
 export const loadCardsFromDisk = async (path: string) => {
   const rawData = (await readFile(path)).toString();

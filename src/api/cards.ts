@@ -1,6 +1,6 @@
 import { Server } from "boardgame.io";
 import Router from "koa-router";
-import { DB } from "../db/db";
+import { DB } from "../db";
 import { CardPack } from "../game/types";
 import { isCard } from "../util";
 

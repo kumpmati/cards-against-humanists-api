@@ -1,4 +1,4 @@
-import { DB } from "../db/db";
+import { DB } from "../db";
 import { SetupData } from "./types";
 
 export const validateSetupData = (setupData: any, numPlayers: number) => {
