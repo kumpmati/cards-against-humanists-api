@@ -15,6 +15,11 @@ export const apiCardsHandler: Router.IMiddleware<any, Server.AppCtx> = async (
     return;
   }
 
+  if (!DB.checkCardPacksExist([ctx.request.body.pack])) {
+    ctx.status = 400;
+    return;
+  }
+
   const cardID = await DB.addCard(ctx.request.body);
   ctx.body = cardID;
 };
