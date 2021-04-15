@@ -41,8 +41,7 @@ export const getCardsHandler: Router.IMiddleware<any, Server.AppCtx> = async (
   }
 
   const packs = queryPacks.map((code) => DB.getCardPack(code));
-  const response = {
+  ctx.body = {
     packs,
   };
-  ctx.body = response;
 };
