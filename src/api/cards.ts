@@ -28,11 +28,15 @@ export const getCardsHandler: Router.IMiddleware<any, Server.AppCtx> = async (
   ctx
 ) => {
   let queryPacks = ctx.query?.["packs"];
-  if (!Array.isArray(queryPacks)) queryPacks = [queryPacks];
   if (!queryPacks) {
     ctx.status = 400;
     return;
   }
+
+  if (queryPacks === "all")
+    queryPacks = DB.getAvailableCardPacks().map((p) => p.code);
+
+  if (!Array.isArray(queryPacks)) queryPacks = [queryPacks];
 
   const packsExist = DB.checkCardPacksExist(queryPacks);
   if (!packsExist) {

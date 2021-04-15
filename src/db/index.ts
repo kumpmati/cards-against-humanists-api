@@ -173,8 +173,8 @@ class Database {
    */
   getAvailableCardPacks() {
     return Array.from(this.cardPacks.values()).map((pack) => ({
-      text: pack.name,
-      value: pack.code,
+      name: pack.name,
+      code: pack.code,
     }));
   }
 
