@@ -8,7 +8,7 @@ import {
   isAtStage,
   numPlayersAtStage,
   setStage,
-} from "../../../util/play";
+} from "./helpers";
 import { CahumG } from "../../types";
 import { submitAnswer, chooseWinner, revealCard } from "./moves";
 

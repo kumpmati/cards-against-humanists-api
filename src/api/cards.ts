@@ -1,6 +1,7 @@
 import { Server } from "boardgame.io";
 import Router from "koa-router";
-import { DB } from "../db";
+import { DB } from "../db/db";
+import { CardPack } from "../game/types";
 import { isCard } from "../util";
 
 /**
@@ -18,23 +19,28 @@ export const newCardHandler: Router.IMiddleware<any, Server.AppCtx> = async (
 
   const card = ctx.request.body;
 
-  if (!DB.checkCardPacksExist([card.pack])) {
+  if (!DB.cardPacksExist([card.pack])) {
     ctx.status = 400;
     ctx.body = "Card pack does not exist";
     return;
   }
 
-  const pack = DB.getAvailableCardPacks().find((p) => p.code === card.pack);
+  const pack = DB.getCardPacks().find((p) => p.code === card.pack);
   if (!pack.editable) {
     ctx.status = 400;
     ctx.body = "Cannot add card to non-editable pack";
     return;
   }
 
-  const cardID = await DB.addCard(ctx.request.body);
+  const cardID = await DB.add(ctx.request.body);
   ctx.body = cardID;
 };
 
+/**
+ * Returns all the cards in the given card packs
+ * @param ctx
+ * @returns
+ */
 export const getCardsHandler: Router.IMiddleware<any, Server.AppCtx> = async (
   ctx
 ) => {
@@ -45,18 +51,11 @@ export const getCardsHandler: Router.IMiddleware<any, Server.AppCtx> = async (
   }
 
   if (queryPacks === "all")
-    queryPacks = DB.getAvailableCardPacks().map((p) => p.code);
+    queryPacks = DB.getCardPacks().map((p: CardPack) => p.code);
 
   if (!Array.isArray(queryPacks)) queryPacks = [queryPacks];
 
-  const packsExist = DB.checkCardPacksExist(queryPacks);
-  if (!packsExist) {
-    ctx.status = 404;
-    return;
-  }
-
-  const packs = queryPacks.map((code) => DB.getCardPack(code));
   ctx.body = {
-    packs,
+    packs: DB.getCardPacks().filter((pack) => queryPacks.includes(pack.code)),
   };
 };

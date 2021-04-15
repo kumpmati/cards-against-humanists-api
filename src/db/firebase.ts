@@ -1,10 +1,9 @@
 import * as admin from "firebase-admin";
 import { Config } from "../config/config";
 import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
-import { cardIsAnswerCard, cardIsQuestionCard, isCard } from "../util";
-import { createCardPack2 } from "../util/db";
+import { cardIsAnswerCard, createCardPack } from "../util";
 import { cardPackConverter } from "./converters";
-import { DBConnector, DBConnectorReq } from "./types";
+import { DBConnector, DBConnectorRequest } from "./types";
 
 /**
  * Firebase DBConnector
@@ -44,21 +43,21 @@ export class FirebaseConnector implements DBConnector {
   }
 
   /**
-   * Queries cards from firestore
+   * Returns all cards
    * @param opts
    * @returns
    */
-  async get<T extends Card>(opts: DBConnectorReq): Promise<T[]> {
+  async get<T extends Card>(opts: DBConnectorRequest): Promise<T[]> {
     this.verifyIsInitialized();
 
     const collection = opts.type === "answer" ? "/answers" : "/questions";
     const data = await this.firestore
       .collection(collection)
       .where("pack", "in", opts.packs)
-      .limit(1)
+      .limit(5)
       .get();
 
-    return data.docs.map((card) => card.data()) as T[];
+    return data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as T[];
   }
 
   /**
@@ -76,12 +75,13 @@ export class FirebaseConnector implements DBConnector {
     const packs = [];
 
     for await (const doc of docs) {
-      const pack = createCardPack2(doc);
+      const pack = createCardPack(doc);
 
       const answers = await this.get<AnswerCard>({
         type: "answer",
         packs: [doc.value],
       });
+
       const questions = await this.get<QuestionCard>({
         type: "question",
         packs: [doc.value],
@@ -120,3 +120,9 @@ export class FirebaseConnector implements DBConnector {
     if (!this.firestore) throw new Error("Firestore not initialized");
   }
 }
+
+const converter = <T>() => ({
+  toFirestore: (data: T) => data,
+  fromFirestore: (snap: FirebaseFirestore.QueryDocumentSnapshot) =>
+    snap.data() as T,
+});

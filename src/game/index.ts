@@ -39,8 +39,8 @@ export const Cahum: Game<CahumG> = {
     };
   },
 
+  // TODO: check if card packs exist
   validateSetupData,
-
   playerView: playPlayerView,
 
   // The seed used by the pseudo-random number generator.

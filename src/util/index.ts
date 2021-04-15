@@ -1,6 +1,7 @@
 import { v4 } from "uuid";
 import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
 import RND from "seedrandom";
+import { FirestoreCardPack } from "../db/types";
 
 /**
  * Returns a shuffled copy of the given array
@@ -38,16 +39,12 @@ export const assignRandomID = <T extends AnswerCard | QuestionCard>(
 export const findCard = (card: AnswerCard, arr: AnswerCard[]) =>
   arr.find((c) => c.id === card.id && c.owner === card.owner);
 
-export const createCardPack = (
-  name: string,
-  code: string,
-  editable?: boolean
-): CardPack => ({
-  name,
-  code,
-  answers: [] as AnswerCard[],
-  questions: [] as QuestionCard[],
-  editable: editable ?? false,
+export const createCardPack = (pack: FirestoreCardPack): CardPack => ({
+  name: pack.text,
+  code: pack.value,
+  editable: pack.editable,
+  answers: [],
+  questions: [],
 });
 
 export const isCard = (card: any): card is Card =>

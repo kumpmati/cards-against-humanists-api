@@ -1,4 +1,4 @@
-import { DB } from "../db";
+import { DB } from "../db/db";
 import { SetupData } from "./types";
 
 export const validateSetupData = (setupData: any, numPlayers: number) => {
@@ -10,10 +10,8 @@ export const validateSetupData = (setupData: any, numPlayers: number) => {
     return "Number of players must be 2 <= x <= 50";
   }
 
-  try {
-    DB.checkCardPacksExist(setupData.packs);
-  } catch (e) {
-    return e.message;
+  if (!DB.cardPacksExist(setupData.packs)) {
+    return "Card pack does not exist";
   }
 };
 

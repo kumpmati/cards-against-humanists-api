@@ -1,21 +1,24 @@
 import { Config } from "../config/config";
 import { Card, CardPack } from "../game/types";
-import { assignRandomID, isCard, shuffle } from "../util";
+import { isCard } from "../util";
 import { getNumTotalCards } from "../util/db";
-import { DB, DBConnector, DBRequest, DBResponse } from "./types";
+import { DBConnector, DBRequest, IDatabase } from "./types";
 
 /**
  * Stores card data in-memory.
  * Uses a connector fetch the data from any source.
  * (Also because boardgame.io doesn't allow async functions)
  */
-class Database implements DB {
+class Database implements IDatabase {
   private connector: DBConnector;
   private cardPacks: Map<string, CardPack>;
 
-  constructor(connector: DBConnector) {
-    this.connector = connector;
+  constructor() {
     this.cardPacks = new Map();
+  }
+
+  use(connector: DBConnector) {
+    this.connector = connector;
   }
 
   /**
@@ -42,33 +45,28 @@ class Database implements DB {
    * Retrieves cards from memory.
    * @param opts
    */
-  get<T extends Card>(opts: DBRequest): DBResponse<T> {
+  get<T extends Card>(opts: DBRequest): T[] {
     if (!this.cardPacksExist(opts.packs)) {
       throw new Error("Card pack does not exist");
     }
 
     const selector = opts.type === "answer" ? "answers" : "questions";
 
-    const unshuffled = opts.packs
+    const cards = opts.packs
       .map((code) => this.cardPacks.get(code)?.[selector])
       .flat(1) as T[];
 
-    const shuffled = shuffle(unshuffled, opts.seed);
-
-    const cards = [] as T[];
-    for (let i = 0; i < opts.n; i++) {
-      const index = (opts.startIndex + i) % shuffled.length;
-      cards.push(shuffled[index]);
-    }
-
-    return {
-      newIndex: opts.startIndex + cards.length,
-      cards: cards.map(assignRandomID),
-    };
+    return cards;
   }
 
+  /**
+   * Inserts a card into the database
+   * @param card
+   * @returns
+   */
   async add(card: Omit<Card, "id">) {
     if (!isCard(card)) throw new Error("Not a card");
+    // TODO: also add into memory
     return await this.connector.add(card);
   }
 
@@ -77,9 +75,26 @@ class Database implements DB {
    * @param code
    * @returns
    */
-  private cardPacksExist(packs: string[]) {
+  cardPacksExist(packs: string[]) {
     return packs.every((p) => this.cardPacks.has(p));
+  }
+
+  /**
+   * Returns all card packs in memory
+   * @returns
+   */
+  getCardPacks() {
+    return Array.from(this.cardPacks.values());
+  }
+
+  /**
+   * Returns a single card pack from memory
+   * @param code
+   * @returns
+   */
+  getCardPack(code: string) {
+    return this.cardPacks.get(code);
   }
 }
 
-export default Database;
+export const DB = new Database();

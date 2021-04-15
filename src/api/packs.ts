@@ -1,16 +1,18 @@
 import { Server } from "boardgame.io";
 import Router from "koa-router";
-import { DB } from "../db";
-
-type NewType = Server.AppCtx;
+import { DB } from "../db/db";
 
 /**
- * Handles GET requests to /cards.
+ * URL: /packs
  * Returns all the available cards packs
  * @param ctx
  */
-export const getCardPacksHandler: Router.IMiddleware<any, NewType> = async (
-  ctx
-) => {
-  ctx.body = DB.getAvailableCardPacks();
+export const getCardPacksHandler: Router.IMiddleware<
+  any,
+  Server.AppCtx
+> = async (ctx) => {
+  ctx.body = DB.getCardPacks().map((pack) => {
+    const { questions, answers, ...rest } = pack;
+    return rest;
+  });
 };

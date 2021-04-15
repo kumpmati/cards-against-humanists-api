@@ -1,4 +1,38 @@
-import { Card, QuestionCard } from "../game/types";
+import { Config } from "../config/config";
+import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
+
+/**
+ * In-memory database that boardgame.io interfaces with.
+ */
+export interface IDatabase {
+  init: (...args: any[]) => Promise<void>;
+  get: <T extends Card>(opts: DBRequest) => T[];
+  add: (card: Omit<Card, "id">) => Promise<string>;
+}
+
+export type DBRequest = {
+  type: "answer" | "question";
+  packs: string[];
+};
+
+/**
+ * Connector to use in DB
+ */
+export interface DBConnector {
+  init: (config: Config, ...args: any[]) => Promise<any>;
+  get: <T extends Card>(opts: DBConnectorRequest) => Promise<T[]>;
+  add: (card: Omit<Card, "id">) => Promise<string>;
+  getAll: () => Promise<CardPack[]>;
+  onChange: (...args: any[]) => Promise<any>;
+  detach: (...args: any) => Promise<any>;
+}
+
+export interface DBConnectorRequest {
+  type: "question" | "answer";
+  packs: string[];
+}
+
+// ----------- old -----------
 
 export type ChangeEvent = FirebaseFirestore.DocumentChange<FirebaseFirestore.DocumentData>;
 export type Snapshot<T> = FirebaseFirestore.QuerySnapshot<T>;
