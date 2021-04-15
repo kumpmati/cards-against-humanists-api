@@ -10,7 +10,7 @@ import {
   isCard,
   shuffle,
 } from "../util";
-import { dbHelpers } from "../util/db";
+import { dbHelpers, getNumTotalCards } from "../util/db";
 import { loadCardsFromDisk } from "./disk";
 import {
   ChangeEvent,
@@ -45,19 +45,13 @@ class Database {
 
   async loadFromDisk(path: string) {
     console.log("Loading cards from disk:", path);
+
     const contents = await loadCardsFromDisk(path);
     for (const pack of contents) {
       this.cardPacks.set(pack.code, pack);
     }
 
-    const total = this.getTotalCards();
-    console.log(
-      "Loaded",
-      total.answers,
-      "answers and",
-      total.questions,
-      "questions from disk"
-    );
+    this.printTotalCards();
   }
 
   /**
@@ -96,15 +90,7 @@ class Database {
     });
 
     await Promise.all([answersPromise, questionsPromise]).then(() => {
-      const total = this.getTotalCards();
-
-      console.log(
-        "Loaded",
-        total.answers,
-        "answers and",
-        total.questions,
-        "questions"
-      );
+      this.printTotalCards();
     });
   }
 
@@ -171,11 +157,11 @@ class Database {
   /**
    * Returns an array containing the names of every available card pack
    */
-  getAvailableCardPacks() {
-    return Array.from(this.cardPacks.values()).map((pack) => ({
-      name: pack.name,
-      code: pack.code,
-    }));
+  getAvailableCardPacks(): Omit<CardPack, "questions" | "answers">[] {
+    return Array.from(this.cardPacks.values()).map((pack) => {
+      const { questions, answers, ...rest } = pack; // strip away questions and answers
+      return rest;
+    });
   }
 
   /**
@@ -269,21 +255,9 @@ class Database {
     }
   }
 
-  /**
-   * Returns an object containing the total number of cards in memory.
-   * @returns
-   */
-  private getTotalCards() {
-    const answers = Array.from(this.cardPacks.values()).reduce(
-      (sum, curr) => sum + curr.answers.length,
-      0
-    );
-    const questions = Array.from(this.cardPacks.values()).reduce(
-      (sum, curr) => sum + curr.questions.length,
-      0
-    );
-
-    return { answers, questions };
+  private printTotalCards() {
+    const total = getNumTotalCards(this.cardPacks);
+    console.log(total.answers, "answers and", total.questions, "questions");
   }
 }
 

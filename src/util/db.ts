@@ -1,5 +1,5 @@
 import { firestore } from "firebase-admin";
-import { AnswerCard, QuestionCard } from "../game/types";
+import { AnswerCard, CardPack, QuestionCard } from "../game/types";
 
 /**
  * Helper function to access Firestore more easily and with type safety.
@@ -21,3 +21,20 @@ const converter = <T>() => ({
 const questionCardConverter = converter<QuestionCard>();
 const answerCardConverter = converter<AnswerCard>();
 const cardPackConverter = converter<any>();
+
+/**
+ * Returns the total number of cards in the database as an object
+ * @param cardPacks
+ */
+export const getNumTotalCards = (cardPacks: Map<string, CardPack>) => {
+  const answers = Array.from(cardPacks.values()).reduce(
+    (sum, curr) => sum + curr.answers.length,
+    0
+  );
+  const questions = Array.from(cardPacks.values()).reduce(
+    (sum, curr) => sum + curr.questions.length,
+    0
+  );
+
+  return { answers, questions, total: answers + questions };
+};

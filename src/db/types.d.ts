@@ -23,4 +23,5 @@ export interface GetCardsResult<T extends Card> {
 export interface FirestoreCardPack {
   text: string;
   value: string;
+  editable: boolean;
 }

@@ -23,6 +23,7 @@ export interface CardPack {
   code: string;
   questions: QuestionCard[];
   answers: AnswerCard[];
+  editable: boolean;
 }
 
 export type CahumG = {

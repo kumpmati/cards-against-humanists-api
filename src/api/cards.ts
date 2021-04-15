@@ -12,11 +12,22 @@ export const newCardHandler: Router.IMiddleware<any, Server.AppCtx> = async (
 ) => {
   if (!isCard(ctx.request.body)) {
     ctx.status = 400;
+    ctx.body = "Card is malformed";
     return;
   }
 
-  if (!DB.checkCardPacksExist([ctx.request.body.pack])) {
+  const card = ctx.request.body;
+
+  if (!DB.checkCardPacksExist([card.pack])) {
     ctx.status = 400;
+    ctx.body = "Card pack does not exist";
+    return;
+  }
+
+  const pack = DB.getAvailableCardPacks().find((p) => p.code === card.pack);
+  if (!pack.editable) {
+    ctx.status = 400;
+    ctx.body = "Cannot add card to non-editable pack";
     return;
   }
 
