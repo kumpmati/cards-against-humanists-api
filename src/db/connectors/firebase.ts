@@ -5,7 +5,8 @@ import { cardIsAnswerCard, createCardPack } from "../../util";
 import { DBConnector, DBConnectorRequest, FirestoreCardPack } from "../types";
 
 /**
- * Firebase DBConnector
+ * Firebase DBConnector.
+ * Reads and writes card data to Firestore.
  */
 export class FirebaseConnector implements DBConnector {
   private app: admin.app.App;
@@ -17,9 +18,10 @@ export class FirebaseConnector implements DBConnector {
   async init(config: Config) {
     console.log("[Firebase] - Initializing...");
 
+    const credentials = JSON.parse(process.env.FB_CREDENTIALS);
     this.app = admin.initializeApp(
       {
-        credential: admin.credential.cert(config.firebase),
+        credential: admin.credential.cert(credentials),
         databaseURL: config.db,
       },
       "db"
@@ -41,7 +43,6 @@ export class FirebaseConnector implements DBConnector {
     const data = await this.firestore
       .collection(collection)
       .where("pack", "in", opts.packs)
-      .limit(5) // TODO: remove
       .get();
 
     return data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as T[];
