@@ -44,18 +44,19 @@ export const newCardHandler: Router.IMiddleware<any, Server.AppCtx> = async (
 export const getCardsHandler: Router.IMiddleware<any, Server.AppCtx> = async (
   ctx
 ) => {
-  let queryPacks = ctx.query?.["packs"];
-  if (!queryPacks) {
+  let query = Array.isArray(ctx.query?.packs)
+    ? ctx.query?.packs
+    : [ctx.query?.packs];
+  if (!query) {
     ctx.status = 400;
     return;
   }
 
-  if (queryPacks === "all")
-    queryPacks = DB.getCardPacks().map((p: CardPack) => p.code);
-
-  if (!Array.isArray(queryPacks)) queryPacks = [queryPacks];
+  if (query.length === 1 && query[0] === "all") {
+    query = DB.getCardPacks().map((pack) => pack.code);
+  }
 
   ctx.body = {
-    packs: DB.getCardPacks().filter((pack) => queryPacks.includes(pack.code)),
+    packs: DB.getCardPacks().filter((pack) => query.includes(pack.code)),
   };
 };
