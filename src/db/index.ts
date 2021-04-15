@@ -127,7 +127,7 @@ class Database {
 
     if (!this.cardPacks.has(card.pack)) {
       console.warn("card pack", card.pack, "does not exist!");
-      //this.cardPacks.set(card.pack, createCardPack(card.pack));
+      return;
     }
 
     const pack = this.cardPacks.get(card.pack);
