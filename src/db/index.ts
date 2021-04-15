@@ -104,7 +104,10 @@ class Database {
     switch (event.type) {
       case "added":
         if (!this.cardPacks.has(doc.value)) {
-          this.cardPacks.set(doc.value, createCardPack(doc.text, doc.value));
+          this.cardPacks.set(
+            doc.value,
+            createCardPack(doc.text, doc.value, doc.editable)
+          );
         } else console.log("duplicate card pack:", doc.value);
         break;
 
