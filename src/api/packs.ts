@@ -8,7 +8,7 @@ type NewType = Server.AppCtx;
  * Handles GET and POST requests to /cards
  * @param ctx
  */
-export const apiCardPacksHandler: Router.IMiddleware<any, NewType> = async (
+export const getCardPacksHandler: Router.IMiddleware<any, NewType> = async (
   ctx
 ) => {
   ctx.body = DB.getAvailableCardPacks();
