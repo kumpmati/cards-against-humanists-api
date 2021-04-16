@@ -31,7 +31,7 @@ export const Cahum: Game<CahumG> = {
       points: {},
       hands: {},
       settings: setupData,
-      db: {
+      deck: {
         answerDeckIndex: 0,
         questionDeckIndex: 0,
         seed: v4(), // used when shuffling cards from DB

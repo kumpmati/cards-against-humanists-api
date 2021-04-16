@@ -30,7 +30,7 @@ export const allCardsRevealed = (G: CahumG) => {
 
 /**
  * Returns fresh answer cards from the deck
- * and updates G.db.answerDeckIndex accordingly
+ * and updates G.deck.answerDeckIndex accordingly
  * @param G
  * @param num
  * @returns
@@ -40,14 +40,14 @@ export const getAnswers = (G: CahumG, num: number): AnswerCard[] => {
     const opts: DeckOpts = {
       n: num,
       type: "answers",
-      startIndex: G.db.answerDeckIndex,
+      startIndex: G.deck.answerDeckIndex,
       packs: G.settings.packs,
-      seed: G.db.seed,
+      seed: G.deck.seed,
     };
 
     const res = getCardsFromDeck<AnswerCard>(opts);
 
-    G.db.answerDeckIndex = res.newIndex;
+    G.deck.answerDeckIndex = res.newIndex;
     return res.cards;
   } catch (e) {
     console.warn(e);
@@ -57,7 +57,7 @@ export const getAnswers = (G: CahumG, num: number): AnswerCard[] => {
 
 /**
  * Returns fresh question cards from the deck
- * and updates G.db.questionDeckIndex accordingly
+ * and updates G.deck.questionDeckIndex accordingly
  * @param G
  * @param num
  * @returns
@@ -67,14 +67,14 @@ export const getQuestions = (G: CahumG, num: number): QuestionCard[] => {
     const opts: DeckOpts = {
       n: num,
       type: "questions",
-      startIndex: G.db.questionDeckIndex,
+      startIndex: G.deck.questionDeckIndex,
       packs: G.settings.packs,
-      seed: G.db.seed,
+      seed: G.deck.seed,
     };
 
     const res = getCardsFromDeck<QuestionCard>(opts);
 
-    G.db.questionDeckIndex = res.newIndex;
+    G.deck.questionDeckIndex = res.newIndex;
     return res.cards;
   } catch (e) {
     console.warn(e);

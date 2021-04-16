@@ -2,18 +2,18 @@ import { PlayStages } from "./phases/play";
 
 export type Card = QuestionCard | AnswerCard;
 
-export interface QuestionCard {
-  id: string;
-  text: string;
-  required_cards: number;
-  pack: string;
-  extra?: Record<string, any>;
-}
-
 export interface AnswerCard {
   id: string;
   owner?: string;
   text: string;
+  pack: string;
+  extra?: Record<string, any>;
+}
+
+export interface QuestionCard {
+  id: string;
+  text: string;
+  required_cards: number;
   pack: string;
   extra?: Record<string, any>;
 }
@@ -39,14 +39,14 @@ export type CahumG = {
     stage: PlayStages;
   };
   settings: SetupData;
-  db: {
+  deck: {
     answerDeckIndex: number;
     questionDeckIndex: number;
     seed: string;
   };
 };
 
-export interface CahumGClient extends Omit<CahumG, "hands" | "db"> {
+export interface CahumGClient extends Omit<CahumG, "hands" | "deck"> {
   hand: AnswerCard[];
 }
 
