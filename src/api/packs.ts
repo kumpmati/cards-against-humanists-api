@@ -11,9 +11,10 @@ export const getCardPacksHandler: Router.IMiddleware<
   any,
   Server.AppCtx
 > = async (ctx) => {
-  ctx.body = DB.getCardPacks().map((pack) => {
-    (pack.answers as any) = pack.answers.length;
-    (pack.questions as any) = pack.questions.length;
-    return pack;
+  const response = DB.getCardPacks().map((pack) => {
+    const { questions, answers, ...rest } = pack;
+    return { ...rest, questions: questions.length, answers: answers.length };
   });
+
+  ctx.response.body = response;
 };
