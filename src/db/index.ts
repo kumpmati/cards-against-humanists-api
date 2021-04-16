@@ -5,9 +5,8 @@ import { getNumTotalCards } from "../util/db";
 import { DBConnector, DBRequest, IDatabase } from "./types";
 
 /**
- * Stores card data in memory.
- * Uses a connector fetch the data from any source.
- * (Also because boardgame.io doesn't allow async functions)
+ * Stores card data in memory. (Because boardgame.io doesn't allow async fetching)
+ * Uses a connector fetch the data from an arbitrary source.
  */
 class Database implements IDatabase {
   private connector: DBConnector;
@@ -17,6 +16,10 @@ class Database implements IDatabase {
     this.cardPacks = new Map();
   }
 
+  /**
+   * Sets the connector to use. Replaces old connector.
+   * @param connector DBConnector
+   */
   use(connector: DBConnector) {
     this.connector = connector;
   }
@@ -43,6 +46,7 @@ class Database implements IDatabase {
 
   /**
    * Retrieves cards from memory.
+   * Called in boardgame.io when players are given new cards or a new question.
    * @param opts
    */
   get<T extends Card>(opts: DBRequest): T[] {
@@ -50,10 +54,9 @@ class Database implements IDatabase {
       throw new Error("Card pack does not exist");
     }
 
-    const selector = opts.type === "answer" ? "answers" : "questions";
-
+    // get cards from all the given packs and flatten them to a 1d array
     const cards = opts.packs
-      .map((code) => this.cardPacks.get(code)?.[selector])
+      .map((code) => this.cardPacks.get(code)?.[opts.type])
       .flat(1) as T[];
 
     return cards;

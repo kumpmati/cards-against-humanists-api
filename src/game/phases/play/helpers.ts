@@ -39,7 +39,7 @@ export const getAnswers = (G: CahumG, num: number): AnswerCard[] => {
   try {
     const opts: DeckOpts = {
       n: num,
-      type: "answer",
+      type: "answers",
       startIndex: G.db.answerDeckIndex,
       packs: G.settings.packs,
       seed: G.db.seed,
@@ -66,7 +66,7 @@ export const getQuestions = (G: CahumG, num: number): QuestionCard[] => {
   try {
     const opts: DeckOpts = {
       n: num,
-      type: "question",
+      type: "questions",
       startIndex: G.db.questionDeckIndex,
       packs: G.settings.packs,
       seed: G.db.seed,
@@ -106,7 +106,7 @@ const getCardsFromDeck = <T extends Card>(opts: DeckOpts) => {
 
 interface DeckOpts {
   n: number;
-  type: "answer" | "question";
+  type: "answers" | "questions";
   startIndex: number;
   packs: string[];
   seed: string;

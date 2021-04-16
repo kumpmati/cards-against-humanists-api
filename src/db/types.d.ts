@@ -11,7 +11,7 @@ export interface IDatabase {
 }
 
 export type DBRequest = {
-  type: "answer" | "question";
+  type: "answers" | "questions";
   packs: string[];
 };
 
