@@ -17,5 +17,5 @@ export const getCardPacksHandler: Router.IMiddleware<
     return { ...rest, questions: questions.length, answers: answers.length };
   });
 
-  ctx.response.body = response;
+  ctx.body = response;
 };
