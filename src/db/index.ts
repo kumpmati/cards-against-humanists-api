@@ -5,7 +5,7 @@ import { getNumTotalCards } from "../util/db";
 import { DBConnector, DBRequest, IDatabase } from "./types";
 
 /**
- * Stores card data in-memory.
+ * Stores card data in memory.
  * Uses a connector fetch the data from any source.
  * (Also because boardgame.io doesn't allow async functions)
  */
