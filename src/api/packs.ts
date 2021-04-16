@@ -3,7 +3,7 @@ import Router from "koa-router";
 import { DB } from "../db";
 
 /**
- * URL: /packs
+ * GET: /packs
  * Returns all the available cards packs
  * @param ctx
  */
@@ -12,7 +12,8 @@ export const getCardPacksHandler: Router.IMiddleware<
   Server.AppCtx
 > = async (ctx) => {
   ctx.body = DB.getCardPacks().map((pack) => {
-    const { questions, answers, ...rest } = pack;
-    return rest;
+    (pack.answers as any) = pack.answers.length;
+    (pack.questions as any) = pack.questions.length;
+    return pack;
   });
 };

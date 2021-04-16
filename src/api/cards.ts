@@ -4,7 +4,8 @@ import { DB } from "../db";
 import { intoArray, isCard } from "../util";
 
 /**
- * Handles POST requests to /cards/new
+ * POST: /cards/new
+ * Handles submitting new cards into the database
  * @param ctx
  */
 export const newCardHandler: Router.IMiddleware<any, Server.AppCtx> = async (
@@ -36,6 +37,7 @@ export const newCardHandler: Router.IMiddleware<any, Server.AppCtx> = async (
 };
 
 /**
+ * GET: /cards
  * Returns all the cards in the given card packs
  * @param ctx
  * @returns
