@@ -8,7 +8,7 @@ export interface IDatabase {
   init: (...args: any[]) => Promise<void>;
   get: <T extends Card>(opts: DBRequest) => T[];
   add: (card: Omit<Card, "id">) => Promise<string>;
-  onChange: (event: DBChangeEvent) => any;
+  onChange: (event: DBChangeEvent<any>) => any;
 }
 
 export type DBRequest = {
@@ -30,7 +30,9 @@ export interface DBConnector {
   get: <T extends Card>(opts: DBConnectorRequest) => Promise<T[]>;
   add: (card: Omit<Card, "id">) => Promise<string>;
   getAll: () => Promise<CardPack[]>;
-  attachListeners: (onChange: (event: DBChangeEvent) => any) => Promise<any>;
+  attachListeners: (
+    onChange: (event: DBChangeEvent<any>) => any
+  ) => Promise<any>;
   detachListeners: () => Promise<any>;
   disconnect: (...args: any) => Promise<any>;
 }
