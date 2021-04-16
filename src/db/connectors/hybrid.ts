@@ -8,7 +8,7 @@ import { FirebaseConnector } from "./firebase";
  * Hybrid connector. Loads all cards initially from disk,
  * then any updates from Firestore will be updated to the disk
  */
-export class HybridConnector implements DBConnector {
+export class DevConnector implements DBConnector {
   private firebase: FirebaseConnector;
   private disk: DiskConnector;
 
