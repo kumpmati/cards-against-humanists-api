@@ -2,24 +2,30 @@ import { Config } from "../../config/config";
 import { Card, CardPack } from "../../game/types";
 import { DBConnector, DBConnectorRequest } from "../types";
 import { DiskConnector } from "./disk";
-import { FirebaseConnector } from "./firebase";
 
 /**
  * Hybrid connector. Loads all cards initially from disk,
- * then any updates from Firestore will be updated to the disk
+ * then the rest of the updates come from the secondary connector
  */
 export class DevConnector implements DBConnector {
-  private firebase: FirebaseConnector;
   private disk: DiskConnector;
+  private secondary: DBConnector;
+
+  /**
+   * Takes in a secondary DB connector to use
+   * as the source of change events.
+   * @param secondary
+   */
+  constructor(secondary: DBConnector) {
+    this.disk = new DiskConnector();
+    this.secondary = secondary;
+  }
 
   async init(config: Config) {
     console.log("[Hybrid] - Initializing...");
 
-    this.firebase = new FirebaseConnector();
-    await this.firebase.init(config);
-
-    this.disk = new DiskConnector();
     await this.disk.init(config);
+    await this.secondary.init(config);
 
     console.log("[Hybrid] - Initialized");
   }
@@ -31,7 +37,7 @@ export class DevConnector implements DBConnector {
    * @returns
    */
   async get<T extends Card>(opts: DBConnectorRequest): Promise<T[]> {
-    return this.firebase.get(opts);
+    return this.secondary.get(opts);
   }
 
   /**

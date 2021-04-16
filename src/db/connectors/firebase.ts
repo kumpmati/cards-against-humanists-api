@@ -52,6 +52,7 @@ export class FirebaseConnector implements DBConnector {
    * Fetches all cards in database
    */
   async getAll(): Promise<CardPack[]> {
+    console.log("[Firebase] - Loading all cards...");
     this.verifyIsInitialized();
 
     const query = await this.firestore
