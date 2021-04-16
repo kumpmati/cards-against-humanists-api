@@ -2,7 +2,7 @@ import { Config } from "../config/config";
 import { Card, CardPack } from "../game/types";
 import { isCard } from "../util";
 import { getNumTotalCards } from "../util/db";
-import { DBConnector, DBRequest, IDatabase } from "./types";
+import { DBChangeEvent, DBConnector, DBRequest, IDatabase } from "./types";
 
 /**
  * Stores card data in memory. (Because boardgame.io doesn't allow async fetching)
@@ -41,6 +41,8 @@ class Database implements IDatabase {
     const total = getNumTotalCards(this.cardPacks);
     console.log(`Loaded ${total.total} cards `);
 
+    this.connector.attachListeners(this.onChange);
+
     console.log("Database initialized");
   }
 
@@ -67,11 +69,15 @@ class Database implements IDatabase {
    * @param card
    * @returns
    */
-  async add(card: Omit<Card, "id">) {
+  add = async (card: Omit<Card, "id">) => {
     if (!isCard(card)) throw new Error("Not a card");
     // TODO: also add into memory
     return await this.connector.add(card);
-  }
+  };
+
+  onChange = (e: DBChangeEvent) => {
+    console.log(e);
+  };
 
   /**
    * Returns true if every given pack exists in-memory

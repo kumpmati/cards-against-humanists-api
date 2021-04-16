@@ -1,5 +1,5 @@
 import { Config } from "../config/config";
-import { AnswerCard, Card, CardPack, QuestionCard } from "../game/types";
+import { Card, CardPack, QuestionCard } from "../game/types";
 
 /**
  * In-memory database that boardgame.io interfaces with.
@@ -8,11 +8,17 @@ export interface IDatabase {
   init: (...args: any[]) => Promise<void>;
   get: <T extends Card>(opts: DBRequest) => T[];
   add: (card: Omit<Card, "id">) => Promise<string>;
+  onChange: (event: DBChangeEvent) => any;
 }
 
 export type DBRequest = {
   type: "answers" | "questions";
   packs: string[];
+};
+
+export type DBChangeEvent = {
+  type: "added" | "modified" | "removed";
+  payload: any;
 };
 
 /**
@@ -23,7 +29,7 @@ export interface DBConnector {
   get: <T extends Card>(opts: DBConnectorRequest) => Promise<T[]>;
   add: (card: Omit<Card, "id">) => Promise<string>;
   getAll: () => Promise<CardPack[]>;
-  attachListeners: (...args: any[]) => Promise<any>;
+  attachListeners: (onChange: (event: DBChangeEvent) => any) => Promise<any>;
   detachListeners: () => Promise<any>;
   disconnect: (...args: any) => Promise<any>;
 }

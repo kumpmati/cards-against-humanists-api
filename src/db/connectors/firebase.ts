@@ -2,7 +2,12 @@ import * as admin from "firebase-admin";
 import { Config } from "../../config/config";
 import { AnswerCard, Card, CardPack, QuestionCard } from "../../game/types";
 import { isAnswerCard, createCardPack } from "../../util";
-import { DBConnector, DBConnectorRequest, FirestoreCardPack } from "../types";
+import {
+  DBChangeEvent,
+  DBConnector,
+  DBConnectorRequest,
+  FirestoreCardPack,
+} from "../types";
 
 /**
  * Firebase DBConnector.
@@ -99,7 +104,23 @@ export class FirebaseConnector implements DBConnector {
   /**
    * TODO: attachListeners
    */
-  async attachListeners() {}
+  async attachListeners(onChange: (e: DBChangeEvent) => any) {
+    console.log("[Firebase] - Attaching listeners...");
+
+    this.firestore.collection("/answers").onSnapshot((snapshot) => {
+      for (const change of snapshot.docChanges()) {
+        onChange({ type: change.type, payload: change.doc.data() });
+      }
+    });
+
+    this.firestore.collection("/questions").onSnapshot((snapshot) => {
+      for (const change of snapshot.docChanges()) {
+        onChange({ type: change.type, payload: change.doc.data() });
+      }
+    });
+
+    console.log("[Firebase] - Listeners attached");
+  }
 
   /**
    * TODO: detachListeners

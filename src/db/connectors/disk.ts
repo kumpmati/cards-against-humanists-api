@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import { Config } from "../../config/config";
 import { Card, CardPack } from "../../game/types";
-import { DBConnector, DBConnectorRequest } from "../types";
+import { DBChangeEvent, DBConnector, DBConnectorRequest } from "../types";
 
 export const loadCardsFromDisk = async (path: string) => {
   const rawData = (await readFile(path)).toString();
@@ -30,6 +30,7 @@ export class DiskConnector implements DBConnector {
   }
 
   async get<T extends Card>(opts: DBConnectorRequest): Promise<T[]> {
+    console.log("TODO: Disk connector - get()");
     return [];
   }
 
@@ -40,6 +41,7 @@ export class DiskConnector implements DBConnector {
    * @returns
    */
   async add(card: Omit<Card, "id">): Promise<string> {
+    console.log("TODO: Disk connector - add()");
     return null;
   }
 
@@ -62,7 +64,11 @@ export class DiskConnector implements DBConnector {
   /**
    * TODO: attachListeners
    */
-  async attachListeners(...args: any[]) {}
+  async attachListeners(onChange: (e: DBChangeEvent) => any) {
+    console.log("[Disk] - Attaching listeners...");
+    console.log("[Disk] - Listeners attached");
+    onChange({ type: "added", payload: { hello: "world" } });
+  }
 
   /**
    * TODO: detachListeners

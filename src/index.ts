@@ -5,15 +5,13 @@ import { DEFAULT_CONFIG } from "./config";
 import { attachApiRoutes } from "./api";
 import { DB } from "./db";
 import { FirebaseConnector } from "./db/connectors/firebase";
-import { DevConnector } from "./db/connectors/dev";
+import { DiskConnector } from "./db/connectors/disk";
 
 const uuid = () => v4().slice(0, 5);
 
 const start = async () => {
-  const firebase = new FirebaseConnector();
-
-  // use dev connector when in dev mode. This
-  DB.use(DEFAULT_CONFIG.dev ? new DevConnector(firebase) : firebase);
+  // use dev connector when in dev mode
+  DB.use(DEFAULT_CONFIG.dev ? new DiskConnector() : new FirebaseConnector());
   await DB.init(DEFAULT_CONFIG);
 
   const server = Server({
