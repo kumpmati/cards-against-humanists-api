@@ -16,9 +16,10 @@ export type DBRequest = {
   packs: string[];
 };
 
-export type DBChangeEvent = {
+export type DBChangeEvent<T> = {
   type: "added" | "modified" | "removed";
-  payload: any;
+  id: string;
+  payload: T;
 };
 
 /**
