@@ -12,6 +12,7 @@ export const getCardPacksHandler: Router.IMiddleware<
   Server.AppCtx
 > = async (ctx) => {
   const response = DB.getCardPacks().map((pack) => {
+    // destructure to avoid mutating the original pack
     const { questions, answers, ...rest } = pack;
     return { ...rest, questions: questions.length, answers: answers.length };
   });
