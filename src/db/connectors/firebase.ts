@@ -17,11 +17,15 @@ export class FirebaseConnector implements DBConnector {
   private app: admin.app.App;
   private firestore: FirebaseFirestore.Firestore;
 
+  private listeners: any[];
+
   /**
    * Initializes Firebase and connects to Firestore.
    */
   async init(config: Config) {
     console.log("[Firebase] - Initializing...");
+
+    this.listeners = [];
 
     const credentials = JSON.parse(process.env.FB_CREDENTIALS);
     this.app = admin.initializeApp(
@@ -104,20 +108,34 @@ export class FirebaseConnector implements DBConnector {
   /**
    * TODO: attachListeners
    */
-  async attachListeners(onChange: (e: DBChangeEvent) => any) {
+  async attachListeners(onChange: (e: DBChangeEvent<any>) => any) {
     console.log("[Firebase] - Attaching listeners...");
 
-    this.firestore.collection("/answers").onSnapshot((snapshot) => {
-      for (const change of snapshot.docChanges()) {
-        onChange({ type: change.type, payload: change.doc.data() });
-      }
-    });
+    const detachAnswerListener = this.firestore
+      .collection("/answers")
+      .onSnapshot((snapshot) => {
+        for (const change of snapshot.docChanges()) {
+          onChange({
+            type: change.type,
+            id: change.doc.id,
+            payload: change.doc.data(),
+          });
+        }
+      });
 
-    this.firestore.collection("/questions").onSnapshot((snapshot) => {
-      for (const change of snapshot.docChanges()) {
-        onChange({ type: change.type, payload: change.doc.data() });
-      }
-    });
+    const detachQuestionListener = this.firestore
+      .collection("/questions")
+      .onSnapshot((snapshot) => {
+        for (const change of snapshot.docChanges()) {
+          onChange({
+            type: change.type,
+            id: change.doc.id,
+            payload: change.doc.data(),
+          });
+        }
+      });
+
+    this.listeners.push(detachAnswerListener, detachQuestionListener);
 
     console.log("[Firebase] - Listeners attached");
   }
@@ -125,7 +143,11 @@ export class FirebaseConnector implements DBConnector {
   /**
    * TODO: detachListeners
    */
-  async detachListeners() {}
+  async detachListeners() {
+    for (const detach of this.listeners) {
+      detach();
+    }
+  }
 
   /**
    * Disconnects from Firebase

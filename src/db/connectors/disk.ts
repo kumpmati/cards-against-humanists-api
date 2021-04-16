@@ -64,10 +64,9 @@ export class DiskConnector implements DBConnector {
   /**
    * TODO: attachListeners
    */
-  async attachListeners(onChange: (e: DBChangeEvent) => any) {
+  async attachListeners(onChange: (e: DBChangeEvent<any>) => any) {
     console.log("[Disk] - Attaching listeners...");
     console.log("[Disk] - Listeners attached");
-    onChange({ type: "added", payload: { hello: "world" } });
   }
 
   /**

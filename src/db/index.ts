@@ -1,6 +1,6 @@
 import { Config } from "../config/config";
 import { Card, CardPack } from "../game/types";
-import { isCard } from "../util";
+import { isAnswerCard, isCard } from "../util";
 import { getNumTotalCards } from "../util/db";
 import { DBChangeEvent, DBConnector, DBRequest, IDatabase } from "./types";
 
@@ -71,12 +71,52 @@ class Database implements IDatabase {
    */
   add = async (card: Omit<Card, "id">) => {
     if (!isCard(card)) throw new Error("Not a card");
-    // TODO: also add into memory
     return await this.connector.add(card);
   };
 
-  onChange = (e: DBChangeEvent) => {
-    console.log(e);
+  onChange = (e: DBChangeEvent<any>) => {
+    if (isCard(e.payload)) {
+      this.onCardChange(e as DBChangeEvent<Card>);
+    } else {
+      console.log("some other change:", e);
+    }
+  };
+
+  private onCardChange = (e: DBChangeEvent<Card>) => {
+    if (!this.cardPacks.has(e.payload.pack)) {
+      console.warn("card pack does not exist:", e.id);
+      return;
+    }
+
+    const pack = this.cardPacks.get(e.payload.pack);
+    const card = e.payload;
+    const arr = (isAnswerCard(card) ? pack.answers : pack.questions) as Card[];
+
+    switch (e.type) {
+      case "modified": {
+        let existing = arr.findIndex((c) => c.id === e.id);
+        if (existing > -1) {
+          console.log("modified", e.id);
+          arr[existing] = card;
+        }
+        break;
+      }
+      case "added": {
+        let existing = arr.findIndex((c) => c.id === e.id);
+        if (existing > -1) {
+          arr[existing] = card;
+        } else {
+          arr.push(card);
+        }
+        break;
+      }
+
+      case "removed": {
+        let index = arr.findIndex((c) => c.id === e.id);
+        if (index > -1) arr.splice(index, 1);
+        break;
+      }
+    }
   };
 
   /**
