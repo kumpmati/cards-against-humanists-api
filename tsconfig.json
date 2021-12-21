@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
-    "noImplicitAny": true,
-    "removeComments": true,
-    "preserveConstEnums": true,
+    "target": "esnext",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
-    "sourceMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
-    "downlevelIteration": true,
-    "lib": ["ES2020"],
-    "sourceRoot": "src/",
-    "outDir": "out/"
-  }
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*.d.ts", "src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

@@ -1,52 +1,36 @@
 {
   "name": "cards-against-humanists-api",
   "version": "1.0.0",
-  "description": "Cards Against Humanists Api",
-  "main": "index.js",
+  "description": "",
+  "main": "out/index.js",
   "scripts": {
-    "start": "node out/index.js",
+    "start": "node dist/index.js",
     "build": "tsc",
-    "dev": "nodemon --config nodemon.json src/index.ts",
-    "dev:debug": "nodemon --config nodemon.json --inspect-brk src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "init": "tsc --init",
+    "dev": "ts-node-dev src/index.ts --watch ./src --clear"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kumpmati/cards-against-humanists-api.git"
   },
-  "keywords": [
-    "node.js",
-    "typescript",
-    "socket.io"
-  ],
-  "author": "Matias Kumpulainen",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kumpmati/cards-against-humanists-api/issues"
   },
   "homepage": "https://github.com/kumpmati/cards-against-humanists-api#readme",
-  "devDependencies": {
-    "@types/express": "^4.17.11",
-    "@types/koa-bodyparser": "^4.3.0",
-    "@types/koa-router": "^7.4.1",
-    "@types/node": "^14.14.31",
-    "@types/seedrandom": "^3.0.0",
-    "@types/socket.io": "^2.1.13",
-    "@types/uuid": "^8.3.0",
-    "nodemon": "^2.0.7",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.2.2"
-  },
   "dependencies": {
-    "bgio-firebase": "^0.3.1",
-    "boardgame.io": "^0.43.3",
+    "@types/socket.io": "^3.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "firebase-admin": "^9.5.0",
-    "koa-bodyparser": "^4.3.0",
-    "seedrandom": "^3.0.5",
-    "socket.io": "^3.1.2",
-    "uuid": "^8.3.2"
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "socket.io": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^17.0.2",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.4"
   }
 }

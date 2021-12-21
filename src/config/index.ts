@@ -1,12 +1,7 @@
-import { config as env } from "dotenv";
-import { Config } from "./config";
+import { config } from 'dotenv';
 
-env(); // load environment variables
+config();
 
-export const DEFAULT_CONFIG: Config = {
-  dev: process.env.ENV
-    ? process.env.ENV === "development"
-    : process.env.NODE_ENV === "development",
-  port: parseInt(process.env.PORT) || 9000,
-  db: process.env.DB_NAME,
-};
+export const PORT = process.env.PORT;
+export const DB_URI = process.env.DB_URI;
+export const ENV = process.env.ENV;

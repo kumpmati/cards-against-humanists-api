@@ -1,17 +1,4 @@
-# nodejs module folder
-node_modules/
+node_modules
 .DS_STORE
-
-# environment variables
 .env
-
-# local files
-*.local
-
-# development files
-dev/
-
-# build target
-out/
-
-OLD/
+dist/
