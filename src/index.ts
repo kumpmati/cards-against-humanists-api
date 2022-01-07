@@ -1,6 +1,4 @@
-import express from 'express';
-import { PORT } from './config';
+import 'module-alias/register'; // used for absolute imports, DO NOT REMOVE
+import { initExpress } from '@/services/express';
 
-const app = express();
-
-app.listen(PORT, () => console.log('listening on port', PORT));
+initExpress();
