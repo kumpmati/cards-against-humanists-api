@@ -13,8 +13,6 @@ export const handleSocketRequest = <Req, Res>(
 
       socket.emit(event, response);
     } catch (err) {
-      console.error('error while handling websocket request:', err);
-
       socket.emit('error', { error: err });
     }
   });

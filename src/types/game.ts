@@ -35,10 +35,10 @@ export type ClientGameState = Omit<ServerGameState, 'hands' | 'deck'> & {
 };
 
 export type ServerGameState = {
-  status: GameStateStatus;
+  phase: GamePhase;
   czar: string | null;
   round: number;
-  roundStartTime: number;
+  phaseStartTime: number;
   table: ServerGameTable;
   hands: Record<string, AnswerCard[]>;
 };
@@ -46,6 +46,7 @@ export type ServerGameState = {
 export type ServerGameTable = {
   question: QuestionCard | null;
   answers: Record<string, AnswerCard[]>;
+  revealed: string[];
 };
 
 export type ServerGame = {
@@ -68,12 +69,13 @@ export type ClientGame = {
   state: ClientGameState;
 };
 
-export type GameStateStatus =
+export type GamePhase =
   | 'IN_LOBBY'
   | 'GAME_START'
   | 'ROUND_START'
   | 'WAITING_FOR_ANSWERS'
   | 'WAITING_FOR_WINNER'
+  | 'REVEALING_CARDS'
   | 'ROUND_END'
   | 'GAME_END';
 

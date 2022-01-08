@@ -11,9 +11,10 @@ export const actionHandler = async (
   game: GameController
 ): Promise<any> => {
   // delegate to game instance's action handlers
-  const success = await game.action(req.event, req.body, socket.data.token!);
+  const error = await game.action(req.event, req.body, socket.data.token!);
+  if (error) throw error;
 
   return {
-    success,
+    success: true,
   };
 };

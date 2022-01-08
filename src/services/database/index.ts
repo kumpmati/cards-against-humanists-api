@@ -1,17 +1,25 @@
+import { AnswerCard, QuestionCard } from '@/types/cards';
 import { GameSettings } from '@/types/game';
 import { GameController } from '../game';
+import cardData from '@/mock/cards.json';
 
 class Database {
   private connected: boolean;
   private games: Record<string, GameController>;
+  private cards: Record<string, { answers: AnswerCard[]; questions: QuestionCard[] }>;
 
   constructor() {
     this.games = {};
+    this.cards = {};
     this.connected = false;
   }
 
   async init() {
     this.connected = true;
+
+    // TODO: load from external database
+    // load mock cards from disk
+    this.cards.mock = cardData as any;
   }
 
   private _checkIsInitialized() {
@@ -27,6 +35,9 @@ class Database {
     }
 
     const game = new GameController(id, settings);
+    // load cards to game
+    game.setDeck(this.cards.mock);
+
     this.games[id] = game;
 
     return game;

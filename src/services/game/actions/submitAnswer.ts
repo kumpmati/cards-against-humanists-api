@@ -1,5 +1,5 @@
-import { AnswerCard } from '@/types/cards';
 import type { ActionHandler, SubmitAnswerAction } from '@/types/game';
+import { gotoPhase } from '@/utils/game';
 
 export const submitAnswerHandler: ActionHandler<SubmitAnswerAction> = async (
   game,
@@ -10,7 +10,12 @@ export const submitAnswerHandler: ActionHandler<SubmitAnswerAction> = async (
 
   const { players, state } = game.getState();
 
-  // find player in game using token
+  // check that game is in correct phase before processing
+  if (state.phase !== 'WAITING_FOR_ANSWERS') {
+    throw new Error('not accepting answers');
+  }
+
+  // find player using token
   const player = players.find((p) => p.token === token);
   if (!player) {
     throw new Error('invalid token');
@@ -21,15 +26,17 @@ export const submitAnswerHandler: ActionHandler<SubmitAnswerAction> = async (
     throw new Error('czar cannot answer');
   }
 
-  const playerHand = state.hands[player.id];
+  const playerHand = state.hands?.[player.id] ?? [];
 
   // get all cards from hand that match an id in the payload
   const matchingCards = playerHand.filter((cardInHand) => payload.cards.includes(cardInHand.id));
 
+  // check that all submitted cards are valid
   if (matchingCards.length !== payload.cards.length) {
     throw new Error('invalid card(s)');
   }
 
+  // check that player has not answered yet
   if (state.table.answers[player.id]) {
     throw new Error('already answered');
   }
@@ -45,6 +52,19 @@ export const submitAnswerHandler: ActionHandler<SubmitAnswerAction> = async (
   // get new cards from deck and add them to the player's hand
   const newCards = game.getAnswerCards(matchingCards.length);
   state.hands[player.id].push(...newCards);
+
+  const remainingPlayers = players.filter(
+    // get all players that are not the czar and have not submitted yet
+    (p) => p.id !== state.czar && !state.table.answers?.[p.id]
+  );
+
+  // still waiting on other players, do nothing else
+  if (remainingPlayers.length) return state;
+
+  // ---------------------------
+  // all players have submitted, advance game state
+  // ---------------------------
+  gotoPhase(state, 'REVEALING_CARDS');
 
   return state;
 };

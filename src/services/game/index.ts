@@ -34,14 +34,15 @@ export class GameController {
     this.id = id;
     this.settings = settings;
     this.state = {
-      status: 'IN_LOBBY',
+      phase: 'WAITING_FOR_ANSWERS',
       czar: null,
       round: 0,
-      roundStartTime: new Date().getTime(),
+      phaseStartTime: new Date().getTime(),
       hands: {},
       table: {
         question: null,
         answers: {},
+        revealed: [],
       },
     };
     this.players = [];
@@ -72,15 +73,27 @@ export class GameController {
   reset() {
     this.state = {
       czar: null,
-      status: 'IN_LOBBY',
+      phase: 'IN_LOBBY',
       round: 0,
-      roundStartTime: new Date().getTime(),
+      phaseStartTime: new Date().getTime(),
       hands: {},
       table: {
         question: null,
         answers: {},
+        revealed: [],
       },
     };
+  }
+
+  /**
+   * Sets which cards the game has in use
+   */
+  setDeck(cards: { answers: AnswerCard[]; questions: QuestionCard[] }) {
+    // shuffle cards using game ID as seed when loading (simulates shuffling the decks before the game)
+    this.deck.answers = shuffle(cards.answers, this.id);
+    this.deck.questions = shuffle(cards.questions, this.id);
+    this.deck.answerIndex = 0;
+    this.deck.questionIndex = 0;
   }
 
   /**
@@ -123,8 +136,8 @@ export class GameController {
         czar: game.state.czar,
         hand: game.state.hands[playerId] ?? [],
         round: game.state.round,
-        roundStartTime: game.state.roundStartTime,
-        status: game.state.status,
+        phaseStartTime: game.state.phaseStartTime,
+        phase: game.state.phase,
         table: game.state.table, // TODO: hide sensitive info
       },
     };
@@ -209,7 +222,7 @@ export class GameController {
   /**
    * Updates the game state then emits an update event
    */
-  async action<T>(event: string, payload: T, token: string): Promise<boolean> {
+  async action<T>(event: string, payload: T, token: string): Promise<string | null> {
     const actions: Record<string, ActionHandler> = {
       submitAnswer: submitAnswerHandler,
       chooseWinner: chooseWinnerHandler,
@@ -227,10 +240,9 @@ export class GameController {
       // override current state with updated state received from action handler
       this._overrideState(newState);
       this.emitUpdate();
-      return true;
+      return null;
     } catch (err) {
-      console.error('Error performing action:', (err as any).message);
-      return false;
+      return (err as any).message;
     }
   }
 
@@ -258,15 +270,12 @@ export class GameController {
   getAnswerCards(n: number = 1): AnswerCard[] {
     const cards = this.deck.answers;
 
-    // shuffle cards with the game ID as seed (simulate deck being shuffled at game start)
-    const shuffledCards = shuffle(cards, this.id);
-
     // get current index and increment it
-    const index = this.deck.answerIndex++ % shuffledCards.length;
+    const index = this.deck.answerIndex++ % cards.length;
 
     // slice amount of cards from shuffled array, wrapping to the first cards when
     // index reaches length of cards
-    return [...shuffledCards, ...shuffledCards].slice(index, index + n);
+    return [...cards, ...cards].slice(index, index + n);
   }
 
   /**
@@ -276,12 +285,9 @@ export class GameController {
   getQuestionCard(): QuestionCard {
     const cards = this.deck.questions;
 
-    // shuffle cards with the game ID as seed (simulate deck being shuffled at game start)
-    const shuffledCards = shuffle(cards, this.id);
-
     // get current index and increment it
-    const index = this.deck.questionIndex++ % shuffledCards.length;
+    const index = this.deck.questionIndex++ % cards.length;
 
-    return shuffledCards[index];
+    return cards[index];
   }
 }
