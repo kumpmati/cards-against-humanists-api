@@ -1,12 +1,13 @@
 import { GameController } from '@/services/game';
-import { ChooseWinnerRequestBody, ChooseWinnerResponseBody } from '@/types/socketio';
+import { ChooseWinnerRequestBody, ChooseWinnerResponseBody, SocketData } from '@/types/socketio';
+import { Socket } from 'socket.io';
 
 /**
  * Handles the czar choosing the winner
  */
 export const chooseWinnerHandler = async (
   req: ChooseWinnerRequestBody,
-  game: GameController
+  socket: Socket<any, any, any, SocketData>
 ): Promise<ChooseWinnerResponseBody> => {
   return {
     success: false,

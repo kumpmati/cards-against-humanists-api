@@ -1,9 +1,9 @@
 import { database } from '@/services/database';
-import { AuthResponseBody, ChooseWinnerResponseBody, SocketData } from '@/types/socketio';
+import { AuthResponseBody, SocketData } from '@/types/socketio';
 import { Socket } from 'socket.io';
 
 /**
- * Handles the czar choosing the winner
+ * Handles authentication
  */
 export const authHandler = async (
   body: Partial<SocketData>,

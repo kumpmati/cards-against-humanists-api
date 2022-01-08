@@ -1,147 +1,217 @@
 import { AnswerCard, QuestionCard } from '@/types/cards';
 import {
-  Game,
+  ServerGame,
   GameEvent,
   GameSettings,
-  GameStateStatus,
-  GameTable,
-  Player,
-  Spectator,
+  ServerGameState,
+  ClientGame,
+  ServerSpectator,
+  ServerPlayer,
 } from '@/types/game';
 import { randomUUID } from 'crypto';
 
-type CallbackFunc = (state: Game) => void | Promise<void>;
+type CallbackFunc = (state: ClientGame) => void | Promise<void>;
 
 export class GameController {
   readonly id: string;
   private settings: GameSettings;
-  private players: Player[];
-  private spectators: Spectator[];
-  private czar: string | null;
-  private hands: Record<string, AnswerCard[]>;
-  private table: GameTable;
-  private round: number;
-  private status: GameStateStatus;
+  private players: ServerPlayer[];
+  private spectators: ServerSpectator[];
+  private state: ServerGameState;
   private deck: {
     answers: AnswerCard[];
     questions: QuestionCard[];
   };
   private listeners: Record<string, CallbackFunc[]>;
 
-  constructor(id: string, settings: GameSettings) {
+  constructor(id: string, settings: GameSettings, initialState?: ServerGameState) {
     this.id = id;
     this.settings = settings;
-    this.czar = null;
+    this.state = {
+      status: 'IN_LOBBY',
+      czar: null,
+      round: 0,
+      roundStartTime: new Date().getTime(),
+      hands: {},
+      table: {
+        question: null,
+        answers: [],
+      },
+    };
     this.players = [];
     this.spectators = [];
-    this.round = 0;
-    this.hands = {};
-    this.status = 'IN_LOBBY';
-    this.table = {
-      question: null,
-      answers: [],
-    };
+
     this.deck = {
       answers: [],
       questions: [],
     };
     this.listeners = {};
+
+    // override state with given state
+    if (initialState) this._overrideState(initialState);
+  }
+
+  /**
+   * Overrides current game state with the given state object.
+   */
+  private _overrideState(state: ServerGameState) {
+    this.state = state;
   }
 
   /**
    * Resets all of the game's state variables
    */
   reset() {
-    this.status = 'IN_LOBBY';
-    this.round = 0;
-    this.hands = {};
-    this.table = {
-      question: null,
-      answers: [],
+    this.state = {
+      czar: null,
+      status: 'IN_LOBBY',
+      round: 0,
+      roundStartTime: new Date().getTime(),
+      hands: {},
+      table: {
+        question: null,
+        answers: [],
+      },
     };
-    this.deck = {
-      answers: [],
-      questions: [],
+  }
+
+  /**
+   * Returns basic info about the game
+   */
+  getInfo() {
+    return {
+      id: this.id,
+      players: this.players.length,
+      settings: this.settings,
     };
   }
 
   /**
    * Returns the whole state of the game
    */
-  private getState(): Game {
+  getState(): ServerGame {
     return {
       id: this.id,
       players: this.players,
       spectators: this.spectators,
       host: this.settings.host,
+      state: this.state,
+      deck: this.deck,
+    };
+  }
+
+  /**
+   * Returns the whole state of the game from the perspective of a single player
+   */
+  getPlayerState(playerId: string): ClientGame {
+    const game = this.getState();
+
+    return {
+      id: game.id,
+      players: game.players, // TODO: hide sensitive info
+      spectators: game.spectators, // TODO: hide sensitive info
+      host: game.host, // TODO: hide sensitive info
       state: {
-        status: this.status,
-        czar: this.czar,
-        deck: this.deck,
-        hands: this.hands,
-        round: this.round,
-        roundEndTime: new Date().getTime(),
-        table: this.table,
+        czar: game.state.czar,
+        hand: game.state.hands[playerId] ?? [],
+        round: game.state.round,
+        roundStartTime: game.state.roundStartTime,
+        status: game.state.status,
+        table: game.state.table, // TODO: hide sensitive info
       },
     };
   }
 
   /**
-   * Adds a player to the game
+   * Sets a new host player for the game.
    */
-  addPlayer(password: string | undefined, nickname: string): Player | null {
-    if (this.settings.password && this.settings.password !== password) {
-      throw new Error('invalid password');
-    }
+  setHost(player: ServerPlayer): ServerPlayer {
+    this.settings.host = player;
+    this._emitUpdate();
+    return player;
+  }
 
+  /**
+   * Adds a player to the game.
+   */
+  addPlayer(nickname: string): ServerPlayer | null {
     if (this.players.some((p) => p.nickname === nickname)) {
       throw new Error('nickname taken');
     }
 
-    const player: Player = {
+    const player: ServerPlayer = {
       id: randomUUID(),
       token: randomUUID(),
       nickname,
       score: 0,
+      status: 'disconnected',
     };
 
     this.players.push(player);
-
+    this._emitUpdate();
     return player;
+  }
+
+  /**
+   * Updates the status of a player
+   */
+  setPlayerStatus(id: string, status: 'connected' | 'disconnected') {
+    const player = this.players.find((p) => p.id === id);
+    if (!player) return false;
+
+    player.status = status;
+    this._emitUpdate();
+    return true;
+  }
+
+  /**
+   * Checks if a player in the game has the token.
+   * Returns the player that has the token, or null if no player has that token.
+   */
+  authenticate(token: string): ServerPlayer | null {
+    return this.players.find((p) => p.token === token) ?? null;
   }
 
   /**
    * Emits an event, calling all listeners with the current game state
    */
-  private _emit(event: GameEvent) {
-    const state = this.getState();
+  private _emitUpdate() {
+    if (!Object.keys(this.listeners).length) return;
 
-    if (!this.listeners[event]) return;
+    for (const [playerId, listenerArr] of Object.entries(this.listeners)) {
+      // get current game state for the player
+      const state = this.getPlayerState(playerId);
 
-    for (const listener of this.listeners[event]) {
-      listener(state);
+      // call every listener for that player ID with the game state
+      for (const listener of listenerArr) {
+        listener(state);
+      }
     }
   }
 
   /**
-   * Attaches an event listener to an event
-   * @param event Event
-   * @param cb Callback to be executed
+   * Subscribes to game updates from the perspective of a single player.
    */
-  on(event: GameEvent, cb: CallbackFunc) {
-    if (!this.listeners[event]) this.listeners[event] = [];
+  subscribe(playerId: string, handler: CallbackFunc) {
+    if (!this.listeners[playerId]) this.listeners[playerId] = [];
+    this.listeners[playerId].push(handler);
 
-    this.listeners[event].push(cb);
-  }
+    // call handler immediately with current value
+    handler(this.getPlayerState(playerId));
 
-  /**
-   * Detaches an event listener from an event
-   * @param event Event
-   * @param cb Callback to detach
-   */
-  off(event: GameEvent, cb: CallbackFunc) {
-    if (!this.listeners[event]) return;
+    // return unsubscribe function to caller
+    return () => {
+      if (!this.listeners[playerId]) return;
 
-    this.listeners[event].splice(this.listeners[event].indexOf(cb), 1);
+      const index = this.listeners[playerId].indexOf(handler);
+      if (index < 0) return;
+
+      this.listeners[playerId].splice(index, 1);
+
+      // remove entries with no listeners
+      if (!this.listeners[playerId].length) {
+        delete this.listeners[playerId];
+      }
+    };
   }
 }

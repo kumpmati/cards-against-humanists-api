@@ -1,8 +1,12 @@
 import { Router } from 'express';
 import { createGameHandler } from './game/create';
 import { deleteGameHandler } from './game/delete';
+import { getGameHandler } from './game/get';
+import { joinGameHandler } from './game/join';
 
-const apiRouter = Router();
+export const apiRouter = Router();
 
 apiRouter.post('/game/create', createGameHandler);
-apiRouter.delete('/game/:id/delete', deleteGameHandler);
+apiRouter.get('/game/:gameId', getGameHandler);
+apiRouter.post('/game/:gameId/join', joinGameHandler);
+//apiRouter.delete('/game/:gameId/delete', deleteGameHandler);

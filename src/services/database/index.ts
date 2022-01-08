@@ -32,7 +32,21 @@ class Database {
     return game;
   }
 
-  async getGame(id: string): Promise<GameController> {
+  async deleteGame(id: string): Promise<boolean> {
+    this._checkIsInitialized();
+
+    if (!(await this.gameExists(id))) {
+      console.error('game does not exist');
+      return false;
+    }
+
+    delete this.games[id];
+    return true;
+  }
+
+  async getGame(id: string): Promise<GameController | null> {
+    if (!(await this.gameExists(id))) return null;
+
     return this.games[id];
   }
 

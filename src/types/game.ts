@@ -1,42 +1,70 @@
-import { AnswerCard, Card, QuestionCard } from './cards';
+import { AnswerCard, QuestionCard } from './cards';
 
 export type GameSettings = {
   name: string;
   password: string | null;
-  host: string;
+  host: ServerPlayer;
   cardPacks: string[];
   maxPoints: number;
   maxRounds: number;
   numCardsInHand: number;
 };
 
-export type Player = {
+export type ServerPlayer = {
   id: string;
   token: string;
   nickname: string;
   score: number;
+  status: 'connected' | 'disconnected';
 };
 
-export type Spectator = {
+export type ClientPlayer = {
+  id: string;
+  nickname: string;
+  score: number;
+  status: 'connected' | 'disconnected';
+};
+
+export type ServerSpectator = {
   id: string;
 };
 
-export type GameState = {
+export type ClientGameState = Omit<ServerGameState, 'hands' | 'deck'> & {
+  hand: AnswerCard[];
+};
+
+export type ServerGameState = {
   status: GameStateStatus;
   czar: string | null;
   round: number;
-  roundEndTime: number;
-  table: GameTable;
-  hands: Record<string, Card[]>;
+  roundStartTime: number;
+  table: ServerGameTable;
+  hands: Record<string, AnswerCard[]>;
+};
+
+export type ServerGameTable = {
+  question: QuestionCard | null;
+  answers: AnswerCard[];
+};
+
+export type ServerGame = {
+  id: string;
+  host: ServerPlayer;
+  players: ServerPlayer[];
+  spectators: ServerSpectator[];
+  state: ServerGameState;
   deck: {
     answers: AnswerCard[];
     questions: QuestionCard[];
   };
 };
 
-export type GameTable = {
-  question: QuestionCard | null;
-  answers: AnswerCard[];
+export type ClientGame = {
+  id: string;
+  host: ClientPlayer;
+  players: ServerPlayer[];
+  spectators: ServerSpectator[];
+  state: ClientGameState;
 };
 
 export type GameStateStatus =
@@ -48,18 +76,12 @@ export type GameStateStatus =
   | 'ROUND_END'
   | 'GAME_END';
 
-export type Game = {
-  id: string;
-  host: string;
-  players: Player[];
-  spectators: Spectator[];
-  state: GameState;
-};
-
 export type GameEvent =
   | 'GAME_STARTED'
   | 'GAME_ENDED'
   | 'PLAYER_JOINED'
+  | 'PLAYER_CONNECTED'
+  | 'PLAYER_DISCONNECTED'
   | 'PLAYER_LEFT'
   | 'CZAR_SELECTED'
   | 'ROUND_STARTED'
@@ -67,4 +89,5 @@ export type GameEvent =
   | 'QUESTION_CHANGED'
   | 'ANSWER_CARD_SUBMITTED'
   | 'ANSWER_CARDS_REVEALED'
-  | 'WINNER_CHOSEN';
+  | 'WINNER_CHOSEN'
+  | 'HOST_CHANGED';

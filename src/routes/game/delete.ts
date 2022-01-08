@@ -1,14 +1,20 @@
+import { database } from '@/services/database';
 import { RequestHandler } from 'express';
 
 type Params = {
-  id: string;
+  gameId: string;
 };
 
 /**
- * Route: DELETE `/api/game/:id`
+ * Route: DELETE `/api/game/:gameId`
  */
 export const deleteGameHandler: RequestHandler<Params> = async (req, res) => {
-  const { id } = req.params;
+  const { gameId } = req.params;
 
-  return res.status(500).end('not implemented');
+  const success = await database.deleteGame(gameId);
+  if (!success) {
+    return res.status(404).json({ error: 404, message: 'game not found' });
+  }
+
+  return res.status(200).end('game deleted');
 };

@@ -1,4 +1,5 @@
 import { PORT } from '@/config';
+import { apiRouter } from '@/routes';
 import cors from 'cors';
 import express from 'express';
 import { Server } from 'http';
@@ -11,9 +12,9 @@ export const initExpress = async () => {
 
   await database.init();
   initSocketIO(http);
-
   app.use(express.json());
   app.use(cors());
+  app.use('/api', apiRouter);
 
   http.listen(PORT, () => console.log('listening on port', PORT));
 };
