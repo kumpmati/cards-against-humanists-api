@@ -1,3 +1,4 @@
+import { GameController } from '@/services/game';
 import { AnswerCard, QuestionCard } from './cards';
 
 export type GameSettings = {
@@ -44,7 +45,7 @@ export type ServerGameState = {
 
 export type ServerGameTable = {
   question: QuestionCard | null;
-  answers: AnswerCard[];
+  answers: Record<string, AnswerCard[]>;
 };
 
 export type ServerGame = {
@@ -76,18 +77,20 @@ export type GameStateStatus =
   | 'ROUND_END'
   | 'GAME_END';
 
-export type GameEvent =
-  | 'GAME_STARTED'
-  | 'GAME_ENDED'
-  | 'PLAYER_JOINED'
-  | 'PLAYER_CONNECTED'
-  | 'PLAYER_DISCONNECTED'
-  | 'PLAYER_LEFT'
-  | 'CZAR_SELECTED'
-  | 'ROUND_STARTED'
-  | 'ROUND_ENDED'
-  | 'QUESTION_CHANGED'
-  | 'ANSWER_CARD_SUBMITTED'
-  | 'ANSWER_CARDS_REVEALED'
-  | 'WINNER_CHOSEN'
-  | 'HOST_CHANGED';
+export type ActionHandler<T = any> = (
+  game: GameController,
+  payload: T,
+  token: string
+) => ServerGameState | Promise<ServerGameState>;
+
+export type ChooseWinnerAction = {
+  cards: string[];
+};
+
+export type SubmitAnswerAction = {
+  cards: string[];
+};
+
+export type RevealCardAction = {
+  cards: string[];
+};

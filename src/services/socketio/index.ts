@@ -1,11 +1,10 @@
 import { ClientToServerEvents, ServerToClientEvents, SocketData } from '@/types/socketio';
-import { handleRequest } from '@/utils/socketio';
+import { handleSocketRequest } from '@/utils/socketio';
 import { Server as HttpServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { database } from '../database';
-import { chooseWinnerHandler } from './events/chooseWinner';
 import { leaveHandler } from './events/leave';
-import { submitAnswerHandler } from './events/submitAnswer';
+import { actionHandler } from './events/action';
 
 /**
  * Initializes the Socket.IO server
@@ -28,7 +27,8 @@ export const initSocketIO = (http: HttpServer) => {
       return next(new Error('game not found'));
     }
 
-    const player = gameController.authenticate(token);
+    // find player associated with the token
+    const player = gameController.authenticatePlayer(token);
     if (!player) {
       return next(new Error('no player matching token'));
     }
@@ -44,12 +44,12 @@ export const initSocketIO = (http: HttpServer) => {
   io.on('connection', async (socket) => {
     const { gameId, userId, token } = socket.data;
 
-    // get game that user is in
+    // get instance of game that user is in
     const game = await database.getGame(socket.data.gameId!);
-    if (!game) return;
-
-    // make socket join the game room
-    socket.join(gameId!);
+    if (!game) {
+      console.error('game not found when socket connected');
+      return;
+    }
 
     // notify game that the player is connected
     game.setPlayerStatus(userId!, 'connected');
@@ -66,19 +66,18 @@ export const initSocketIO = (http: HttpServer) => {
     /**
      * Ingame requests
      */
-    handleRequest(socket, 'submitAnswer', submitAnswerHandler);
-    handleRequest(socket, 'chooseWinner', chooseWinnerHandler);
-    handleRequest(socket, 'leave', leaveHandler);
+    handleSocketRequest(socket, game, 'action', actionHandler);
+    handleSocketRequest(socket, game, 'leave', leaveHandler);
 
     /**
-     * Authentication failed
+     * Player authentication failed
      */
     socket.on('connect_error', (err) => {
       console.log('connection error:', err);
     });
 
     /**
-     * Disconnect
+     * Player disconnected
      */
     socket.on('disconnect', () => {
       game.setPlayerStatus(userId!, 'disconnected');

@@ -1,4 +1,3 @@
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { ClientGame, ClientPlayer, ServerSpectator } from './game';
 
 export type InGameRequest<T> = {
@@ -16,7 +15,7 @@ export type SocketData = {
 /**
  * All events that the users can send to the server
  */
-export interface ClientToServerEvents extends DefaultEventsMap {
+export interface ClientToServerEvents {
   // outside game
   auth: (d: AuthRequestBody) => void;
   join: (d: PlayerJoinRequestBody) => void;
@@ -24,15 +23,16 @@ export interface ClientToServerEvents extends DefaultEventsMap {
 
   // ingame
   leave: (d: LeaveRequestBody) => void;
-  submitAnswer: (d: SubmitAnswerRequestBody) => void;
-  chooseWinner: (d: ChooseWinnerRequestBody) => void;
-  getState: (d: GetStateRequestBody) => void;
+  action: <E extends ActionEvent, B>(d: Action<E, B>) => void;
+
+  // socket.io's own events
+  connect_error: (d: string) => void;
 }
 
 /**
  * All the events that the server can send to the users
  */
-export interface ServerToClientEvents extends DefaultEventsMap {
+export interface ServerToClientEvents {
   // outside game
   auth: (d: AuthResponseBody) => void;
   join: (d: PlayerJoinResponseBody) => void;
@@ -40,10 +40,8 @@ export interface ServerToClientEvents extends DefaultEventsMap {
 
   // ingame
   leave: (d: LeaveResponseBody) => void;
-  submitAnswer: (d: SubmitAnswerResponseBody) => void;
-  chooseWinner: (d: ChooseWinnerResponseBody) => void;
-  getState: (d: GetStateResponseBody) => void;
-  stateChanged: (d: StateUpdateResponseBody) => void;
+  action: <E extends ActionEvent, B>(d: Action<E, B>) => void;
+  stateChanged: (d: StateUpdateBody) => void;
 }
 
 /**
@@ -86,27 +84,16 @@ export type LeaveRequestBody = Record<string, never>; // empty object
 export type LeaveResponseBody = { success: boolean };
 
 /**
- * Submit answer
+ * State update
  */
-export type SubmitAnswerRequestBody = InGameRequest<{
-  userId: string;
-  cardId: string;
-}>;
-export type SubmitAnswerResponseBody = { success: boolean };
+export type StateUpdateBody = InGameRequest<ClientGame>;
 
 /**
- * Choose winner
+ * Action
  */
-export type ChooseWinnerRequestBody = InGameRequest<{
-  userId: string;
-  cardId: string;
-}>;
-export type ChooseWinnerResponseBody = { success: boolean };
+export type Action<EventType extends ActionEvent, B extends any> = {
+  event: EventType;
+  body: B;
+};
 
-export type GetStateRequestBody = InGameRequest<{
-  playerId: string;
-  token: string;
-}>;
-export type GetStateResponseBody = InGameRequest<ClientGame>;
-
-export type StateUpdateResponseBody = InGameRequest<ClientGame>;
+export type ActionEvent = 'submitAnswer' | 'chooseWinner' | 'revealCard';

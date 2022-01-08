@@ -7,7 +7,8 @@ import { Socket } from 'socket.io';
  */
 export const leaveHandler = async (
   req: LeaveRequestBody,
-  socket: Socket<any, any, any, SocketData>
+  socket: Socket<any, any, any, SocketData>,
+  game: GameController
 ): Promise<LeaveResponseBody> => {
   return {
     success: false,

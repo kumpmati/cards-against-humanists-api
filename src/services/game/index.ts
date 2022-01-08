@@ -1,14 +1,18 @@
-import { AnswerCard, QuestionCard } from '@/types/cards';
+import { AnswerCard, Card, QuestionCard } from '@/types/cards';
 import {
   ServerGame,
-  GameEvent,
   GameSettings,
   ServerGameState,
   ClientGame,
   ServerSpectator,
   ServerPlayer,
+  ActionHandler,
 } from '@/types/game';
 import { randomUUID } from 'crypto';
+import { chooseWinnerHandler } from './actions/chooseWinner';
+import { revealCardHandler } from './actions/revealCard';
+import { submitAnswerHandler } from './actions/submitAnswer';
+import { shuffle } from 'shuffle-seed';
 
 type CallbackFunc = (state: ClientGame) => void | Promise<void>;
 
@@ -20,7 +24,9 @@ export class GameController {
   private state: ServerGameState;
   private deck: {
     answers: AnswerCard[];
+    answerIndex: number;
     questions: QuestionCard[];
+    questionIndex: number;
   };
   private listeners: Record<string, CallbackFunc[]>;
 
@@ -35,7 +41,7 @@ export class GameController {
       hands: {},
       table: {
         question: null,
-        answers: [],
+        answers: {},
       },
     };
     this.players = [];
@@ -44,6 +50,8 @@ export class GameController {
     this.deck = {
       answers: [],
       questions: [],
+      answerIndex: 0,
+      questionIndex: 0,
     };
     this.listeners = {};
 
@@ -70,7 +78,7 @@ export class GameController {
       hands: {},
       table: {
         question: null,
-        answers: [],
+        answers: {},
       },
     };
   }
@@ -127,8 +135,20 @@ export class GameController {
    */
   setHost(player: ServerPlayer): ServerPlayer {
     this.settings.host = player;
-    this._emitUpdate();
+    this.emitUpdate();
     return player;
+  }
+
+  /**
+   * Updates the status of a player
+   */
+  setPlayerStatus(id: string, status: 'connected' | 'disconnected') {
+    const player = this.players.find((p) => p.id === id);
+    if (!player) return false;
+
+    player.status = status;
+    this.emitUpdate();
+    return true;
   }
 
   /**
@@ -148,45 +168,16 @@ export class GameController {
     };
 
     this.players.push(player);
-    this._emitUpdate();
+    this.emitUpdate();
     return player;
-  }
-
-  /**
-   * Updates the status of a player
-   */
-  setPlayerStatus(id: string, status: 'connected' | 'disconnected') {
-    const player = this.players.find((p) => p.id === id);
-    if (!player) return false;
-
-    player.status = status;
-    this._emitUpdate();
-    return true;
   }
 
   /**
    * Checks if a player in the game has the token.
    * Returns the player that has the token, or null if no player has that token.
    */
-  authenticate(token: string): ServerPlayer | null {
+  authenticatePlayer(token: string): ServerPlayer | null {
     return this.players.find((p) => p.token === token) ?? null;
-  }
-
-  /**
-   * Emits an event, calling all listeners with the current game state
-   */
-  private _emitUpdate() {
-    if (!Object.keys(this.listeners).length) return;
-
-    for (const [playerId, listenerArr] of Object.entries(this.listeners)) {
-      // get current game state for the player
-      const state = this.getPlayerState(playerId);
-
-      // call every listener for that player ID with the game state
-      for (const listener of listenerArr) {
-        listener(state);
-      }
-    }
   }
 
   /**
@@ -213,5 +204,84 @@ export class GameController {
         delete this.listeners[playerId];
       }
     };
+  }
+
+  /**
+   * Updates the game state then emits an update event
+   */
+  async action<T>(event: string, payload: T, token: string): Promise<boolean> {
+    const actions: Record<string, ActionHandler> = {
+      submitAnswer: submitAnswerHandler,
+      chooseWinner: chooseWinnerHandler,
+      revealCard: revealCardHandler,
+      default: () => {
+        throw new Error('invalid action');
+      },
+    };
+
+    try {
+      // get handler function
+      const handler = actions?.[event] ?? actions.default;
+      const newState = await handler(this, payload, token);
+
+      // override current state with updated state received from action handler
+      this._overrideState(newState);
+      this.emitUpdate();
+      return true;
+    } catch (err) {
+      console.error('Error performing action:', (err as any).message);
+      return false;
+    }
+  }
+
+  /**
+   * Emits an event, calling all listeners with the current game state
+   */
+  private emitUpdate() {
+    if (!Object.keys(this.listeners).length) return;
+
+    for (const [playerId, listenerArr] of Object.entries(this.listeners)) {
+      // get current game state for the player
+      const state = this.getPlayerState(playerId);
+
+      // call every listener for that player ID with the game state
+      for (const listener of listenerArr) {
+        listener(state);
+      }
+    }
+  }
+
+  /**
+   * Returns the next `n` number of answer cards from the deck.
+   * Does not remove the cards from the deck.
+   */
+  getAnswerCards(n: number = 1): AnswerCard[] {
+    const cards = this.deck.answers;
+
+    // shuffle cards with the game ID as seed (simulate deck being shuffled at game start)
+    const shuffledCards = shuffle(cards, this.id);
+
+    // get current index and increment it
+    const index = this.deck.answerIndex++ % shuffledCards.length;
+
+    // slice amount of cards from shuffled array, wrapping to the first cards when
+    // index reaches length of cards
+    return [...shuffledCards, ...shuffledCards].slice(index, index + n);
+  }
+
+  /**
+   * Returns the next question card from the deck.
+   * Does not remove the card from the deck.
+   */
+  getQuestionCard(): QuestionCard {
+    const cards = this.deck.questions;
+
+    // shuffle cards with the game ID as seed (simulate deck being shuffled at game start)
+    const shuffledCards = shuffle(cards, this.id);
+
+    // get current index and increment it
+    const index = this.deck.questionIndex++ % shuffledCards.length;
+
+    return shuffledCards[index];
   }
 }
